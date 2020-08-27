@@ -1,8 +1,8 @@
-const Message = require("../models/message");
+const User = require("../models/user");
 
-exports.getAllMessages = () => {
+exports.getAllUsers = () => {
   return new Promise((resolve, reject) => {
-    Message.find()
+    User.find()
       .exec((error, messages) => {
         if (error) {
           reject(error);
@@ -13,16 +13,17 @@ exports.getAllMessages = () => {
   });
 };
 
-exports.createMessage = (message) => {
+exports.createUser = (user) => {
   return new Promise((resolve, reject) => {
-    const newMessage = new Message({
-      text: message.text
+    const newUser = new User({
+      username: user.username,
+      password: user.password
     });
-    newMessage.save((err) => {
+    newUser.save((err) => {
       if (err) {
         reject(err);
       }
-      resolve(newMessage);
+      resolve(newUser);
     });
   });
 };
