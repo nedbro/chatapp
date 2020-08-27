@@ -3,11 +3,11 @@ const User = require("../models/user");
 exports.getAllUsers = () => {
   return new Promise((resolve, reject) => {
     User.find()
-      .exec((error, messages) => {
+      .exec((error, users) => {
         if (error) {
           reject(error);
         } else {
-          resolve(messages);
+          resolve(users);
         }
       });
   });
@@ -19,9 +19,9 @@ exports.createUser = (user) => {
       username: user.username,
       password: user.password
     });
-    newUser.save((err) => {
-      if (err) {
-        reject(err);
+    newUser.save((error) => {
+      if (error) {
+        reject(error);
       }
       resolve(newUser);
     });
