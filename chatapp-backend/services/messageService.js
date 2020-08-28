@@ -5,7 +5,7 @@ exports.getAllMessages = () => {
     Message.find()
       .exec((error, messages) => {
         if (error) {
-          reject(error);
+          reject({ errors: { ...error } });
         } else {
           resolve(messages);
         }
@@ -18,9 +18,9 @@ exports.createMessage = (message) => {
     const newMessage = new Message({
       text: message.text
     });
-    newMessage.save((err) => {
-      if (err) {
-        reject(err);
+    newMessage.save((error) => {
+      if (error) {
+        reject({ errors: { ...error } });
       }
       resolve(newMessage);
     });

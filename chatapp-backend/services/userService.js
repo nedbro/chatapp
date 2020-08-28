@@ -5,7 +5,7 @@ exports.getAllUsers = () => {
     User.find()
       .exec((error, users) => {
         if (error) {
-          reject(error);
+          reject({ errors: { ...error } });
         } else {
           resolve(users);
         }
@@ -21,7 +21,7 @@ exports.createUser = (user) => {
     });
     newUser.save((error) => {
       if (error) {
-        reject(error);
+        reject({ errors: { ...error } });
       }
       resolve(newUser);
     });

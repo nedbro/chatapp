@@ -1,7 +1,7 @@
+const mongoose = require("mongoose");
 const Conversation = require("../models/conversation");
 const User = require("../models/user");
 const Message = require("../models/message");
-const async = require("async");
 
 exports.getAllConversations = () => {
   return new Promise((resolve, reject) => {
@@ -22,53 +22,104 @@ exports.createConversation = (conversation) => {
 
     const users = await User.find().where("_id").in(conversation.users);
     if (users.length < 2) {
-      reject({ message: "The user input is incorrect" });
+      reject({ errors: { message: "The user input is incorrect" } });
     }
-
-    const message = await new Message({ text: conversation.message });
 
     const conversations = await Conversation.find({ participants: users });
     if (conversations.length !== 0) {
-      reject({ message: "This conversation already exists" });
+      reject({ errors: { message: "This conversation already exists" } });
     }
 
     const newConversations = new Conversation({
       name: conversation.name,
       participants: users,
-      messages: [message]
+      messages: []
     });
+
     newConversations.save((error) => {
       if (error) {
-        reject(error);
+        reject({ errors: { ...error, message: "There was an error while saving the conversation" } });
       }
-      message.save((error) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(newConversations);
-      });
+      resolve();
     });
   });
 };
 
 exports.deleteConversation = (id) => {
   return new Promise(async (resolve, reject) => {
-    console.log("id", id);
     Conversation
       .findById(id)
       .populate("messages")
       .exec((error, conversation) => {
-        Message.deleteMany({ _id: conversation.messages }).then((error) => {
-          if (error) {
-            reject({ message: "There was an error deleting messages" });
-          }
+        if (!conversation) {
+          reject({ errors: { message: "The conversation doesn't exists" }, status: 400 });
+          return;
+        }
 
-          Conversation.deleteOne({ id: conversation._id }).then((error) => {
+        if (conversation.messages.length > 0) {
+          Message.deleteMany({ _id: conversation.messages }, (error) => {
             if (error) {
-              reject(error);
+              reject({ errors: { ...error, message: "There was an error deleting messages" } });
+              return;
             }
 
+            Conversation.deleteOne({ id: mongoose.ObjectId(conversation._id, {}) }, () => {
+              if (error) {
+                reject({ errors: { ...error, message: "There was an error during the conversation deletion" } });
+                return;
+              }
+              resolve();
+            });
+
+          });
+        } else {
+          Conversation.deleteOne({ id: mongoose.ObjectId(conversation._id, {}) }, () => {
+            if (error) {
+              reject({ errors: { ...error, message: "There was an error during the conversation deletion" } });
+              return;
+            }
             resolve();
+          });
+        }
+      });
+  });
+};
+
+exports.sendMessage = (id, messageInput) => {
+  return new Promise(async (resolve, reject) => {
+    Conversation
+      .findById(id)
+      .exec(async (error, conversation) => {
+        if (!conversation) {
+          reject({ errors: { message: "The conversation doesn't exists" }, status: 400 });
+          return;
+        }
+
+        let sender;
+        User.findById(messageInput.sender, (error, user) => {
+          if (error) {
+            reject({ errors: { ...error, message: "The user was not found" } });
+            return;
+          }
+
+          sender = user;
+
+          const message = new Message({
+            text: messageInput.messageText,
+            sender: user
+          });
+
+          message.save((error) => {
+            if (error) {
+              reject({ errors: { ...error, message: "There was an error while saving the message" } });
+            }
+            conversation.messages.push(message);
+            conversation.save((error) => {
+              if (error) {
+                reject({ errors: { ...error, message: "There was an error while saving the conversation" } });
+              }
+              resolve();
+            });
           });
         });
       });
