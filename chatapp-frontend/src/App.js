@@ -1,15 +1,16 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Link } from "react-router-dom";
 import "./App.css";
 import UserRegistartion from "./routes/registration/UserRegistration";
 import ConversationPage from "./routes/conversation/ConversationPage";
-import { Grid } from "@material-ui/core";
+import { Grid, StylesProvider, CssBaseline } from "@material-ui/core";
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Grid container>
+    <StylesProvider injectFirst>
+      <CssBaseline />
+      <div className="App fullHeight">
+        <Grid container className="fullHeight">
           <Switch>
             <Route path="/registration">
               <UserRegistartion />
@@ -20,7 +21,7 @@ function App() {
           </Switch>
         </Grid>
       </div>
-    </Router>
+    </StylesProvider>
   );
 }
 

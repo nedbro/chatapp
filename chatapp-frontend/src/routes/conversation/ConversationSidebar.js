@@ -1,13 +1,19 @@
 import React from "react";
-import { Grid } from "@material-ui/core";
+import { Grid, Box, Paper } from "@material-ui/core";
 
 const ConversationSidebar = ({ conversations }) => {
   const conversationList = conversations.map((conversation) => {
-    return <div>{conversation.name + ": " + conversation["_id"]}</div>;
+    return (
+      <Grid item xs={4} className="fullWidth" key={conversation._id}>
+        <Box className="fullWidth">
+          {conversation.name + ": " + conversation["_id"]}
+        </Box>
+      </Grid>
+    );
   });
 
   return (
-    <Grid item container direction="columnt" xs={4}>
+    <Grid item container direction="column" xs={4}>
       {conversationList}
     </Grid>
   );
