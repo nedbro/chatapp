@@ -1,0 +1,6 @@
+chatapp-frontend/node_modules
+chatapp-frontend/package.json
+chatapp-frontend/package-lock.json
+chatapp-backend/node_modules
+chatapp-backend/package.json
+chatapp-backend/package-lock.json
