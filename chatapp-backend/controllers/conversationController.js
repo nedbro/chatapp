@@ -28,6 +28,13 @@ router.post("/", [
   }
 ]);
 
+router.get("/:id", ((req, res, next) => {
+  conversationService.getConversation(req.params.id).then(
+    (data) => res.json(data),
+    error => next(error)
+  );
+}));
+
 router.delete("/:id", ((req, res, next) => {
   conversationService.deleteConversation(req.params.id).then(
     () => res.sendStatus(200),

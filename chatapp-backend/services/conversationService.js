@@ -17,6 +17,22 @@ exports.getAllConversations = () => {
   });
 };
 
+exports.getConversation = (id) => {
+  return new Promise((resolve, reject) => {
+    Conversation.findById(id)
+      .populate(["participants", "messages"])
+      .exec((error, conversation) => {
+        if (error) {
+          reject(error);
+        } else if (conversation) {
+          resolve(conversation);
+        } else {
+          reject({ status: 404, message: "This conversation doesn't exists" });
+        }
+      });
+  });
+};
+
 exports.createConversation = (conversation) => {
   return new Promise(async (resolve, reject) => {
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Input from "@material-ui/core/Input";
-import { Grid, Button } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
 import axios from "axios";
 import { SERVER_URL } from "../../utils/Constants";
 
@@ -19,7 +19,7 @@ const UserRegistration = () => {
   const saveUser = () => {
     const userToSave = {
       username: username,
-      password: password,
+      password: password
     };
 
     axios
@@ -29,8 +29,8 @@ const UserRegistration = () => {
 
   return (
     <Grid container item xs={6} direction="column">
-      <Input value={username} onChange={updateUsername}></Input>
-      <Input value={password} onChange={updatePassword} type="password"></Input>
+      <Input value={username} onChange={updateUsername} />
+      <Input value={password} onChange={updatePassword} type="password" />
       <Button variant="contained" onClick={saveUser}>
         Save
       </Button>

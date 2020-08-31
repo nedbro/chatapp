@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URL } from "../../utils/Constants";
 import { Grid } from "@material-ui/core";
@@ -16,24 +16,48 @@ const ConversationPage = () => {
       const conversationData = result.data;
 
       setConversations(result.data);
-      setCurrentConversation(conversationData[0]["_id"]);
+      setCurrentConversation(conversationData[0]);
       setCurrentMessages(conversationData[0].messages);
-      setCurrentUser(conversationData[0].participants[0]["_id"]);
+      setCurrentUser(conversationData[0].participants[0]);
     });
   }, []);
 
   const getConversation = (conversationId) => {
-    axios
-      .get(SERVER_URL + "/conversations/" + conversationId)
-      .then((result) => {
-        return result.data;
+    return axios
+      .get(SERVER_URL + "/conversations/" + conversationId);
+  };
+
+  const sendMessage = (message) => {
+    const messageToSend = {
+      sender: currentUser["_id"],
+      messageText: message
+    };
+
+    axios.post(SERVER_URL + "/conversations/" + currentConversation["_id"], messageToSend).then(() => {
+      getConversation(currentConversation["_id"]).then((result) => {
+        const conversationData = result.data;
+        setCurrentConversation(conversationData);
+        setCurrentMessages(conversationData.messages);
       });
+    });
+  };
+
+  const selectConversation = (conversation) => {
+    setCurrentConversation(conversation);
+    setCurrentMessages(conversation.messages);
   };
 
   return (
     <Grid item container>
-      <ConversationSidebar conversations={conversations} />
-      <ConversationMessages messages={currentMessages} />
+      <ConversationSidebar
+        conversations={conversations}
+        selectConversation={selectConversation}
+      />
+      <ConversationMessages
+        messages={currentMessages}
+        sendMessage={sendMessage}
+        currentUser={currentUser}
+      />
     </Grid>
   );
 };
