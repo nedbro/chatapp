@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const conversationService = require("../services/conversationService");
+const { checkAuthenticated } = require("../services/loginService");
 const { body, validationResult, check } = require("express-validator");
 
 
-router.get("/", (req, res, next) => {
+router.get("/", checkAuthenticated, (req, res, next) => {
   conversationService.getAllConversations().then(
     conversations => res.json(conversations),
     error => next(error)
@@ -12,6 +13,7 @@ router.get("/", (req, res, next) => {
 });
 
 router.post("/", [
+  checkAuthenticated,
   body("users").isArray({ min: 2 }).withMessage("The provided user input is incorrect"),
   body("users.*").isString().withMessage("The provided user input is incorrect"),
   body("name").isString().trim().isLength({ min: 1 }),
@@ -28,14 +30,14 @@ router.post("/", [
   }
 ]);
 
-router.get("/:id", ((req, res, next) => {
+router.get("/:id", checkAuthenticated, ((req, res, next) => {
   conversationService.getConversation(req.params.id).then(
     (data) => res.json(data),
     error => next(error)
   );
 }));
 
-router.delete("/:id", ((req, res, next) => {
+router.delete("/:id", checkAuthenticated, ((req, res, next) => {
   conversationService.deleteConversation(req.params.id).then(
     () => res.sendStatus(200),
     error => next(error)
@@ -43,6 +45,7 @@ router.delete("/:id", ((req, res, next) => {
 }));
 
 router.post("/:id", [
+  checkAuthenticated,
   body("sender").isString().withMessage("The provided user input is incorrect"),
   body("messageText").isString().trim().isLength({ min: 1 }),
   (req, res, next) => {

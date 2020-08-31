@@ -4,12 +4,22 @@ import { SERVER_URL } from "../../utils/Constants";
 import { Grid } from "@material-ui/core";
 import ConversationSidebar from "./ConversationSidebar";
 import ConversationMessages from "./ConversationMessages";
+import { useHistory } from "react-router-dom";
 
 const ConversationPage = () => {
   const [currentConversation, setCurrentConversation] = useState("");
   const [currentUser, setCurrentUser] = useState("");
   const [conversations, setConversations] = useState([]);
   const [currentMessages, setCurrentMessages] = useState([]);
+  const history = useHistory();
+  const user = localStorage.getItem("user");
+
+  useEffect(() => {
+    if (user === null) {
+      history.push("/login");
+    }
+  }, []);
+
 
   useEffect(() => {
     axios.get(SERVER_URL + "/conversations").then((result) => {

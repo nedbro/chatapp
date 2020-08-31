@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const messageService = require("../services/messageService");
+const { checkAuthenticated } = require("../services/loginService");
 const { body, validationResult, check } = require("express-validator");
 
-router.get("/", (req, res, next) => {
+router.get("/", checkAuthenticated, (req, res, next) => {
   messageService.getAllMessages().then(
     messages => res.json(messages),
     error => next(error)

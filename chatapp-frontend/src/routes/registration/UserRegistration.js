@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "@material-ui/core/Input";
 import { Button, Grid } from "@material-ui/core";
 import axios from "axios";
 import { SERVER_URL } from "../../utils/Constants";
+import { useHistory } from "react-router-dom";
 
 const UserRegistration = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  const history = useHistory();
+  const user = localStorage.getItem("user");
+
+  useEffect(() => {
+    if (user !== null) {
+      history.push("/conversation");
+    }
+  }, []);
 
   const updateUsername = (event) => {
     setUsername(event.target.value);

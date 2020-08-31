@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const userService = require("../services/userService");
+const { checkNotAuthenticated } = require("../services/loginService");
+const { checkAuthenticated } = require("../services/loginService");
 const { body, validationResult, check } = require("express-validator");
 
 
 /* GET users listing. */
-router.get("/", (req, res, next) => {
+router.get("/", checkAuthenticated, (req, res, next) => {
   userService.getAllUsers().then(
     users => res.json(users),
     error => next(error)
@@ -13,6 +15,7 @@ router.get("/", (req, res, next) => {
 });
 
 router.post("/", [
+  checkNotAuthenticated,
   body("username").trim().isLength({ min: 1, max: 15 }),
   body("password").trim().isLength({ min: 1 }),
   check("*").escape(),
