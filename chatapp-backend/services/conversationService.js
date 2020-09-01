@@ -141,3 +141,17 @@ exports.sendMessage = (id, messageInput) => {
       });
   });
 };
+
+exports.getConversationsOfUser = (user) => {
+  return new Promise((resolve, reject) => {
+    Conversation.find({ participants: [user["_id"]] })
+      .populate(["participants", "messages"])
+      .exec((error, conversations) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(conversations);
+        }
+      });
+  });
+};

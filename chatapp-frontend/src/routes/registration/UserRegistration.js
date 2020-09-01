@@ -33,8 +33,14 @@ const UserRegistration = () => {
     };
 
     axios
-      .post(SERVER_URL + "/users", userToSave)
-      .then((response) => console.log("user mentés sikeres volt"));
+      .post(SERVER_URL + "/users", userToSave, { withCredentials: true })
+      .then((response) => console.log("user mentés sikeres volt"))
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("user");
+          history.push("/login");
+        }
+      });
   };
 
   return (

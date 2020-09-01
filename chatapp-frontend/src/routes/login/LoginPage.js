@@ -24,7 +24,6 @@ const LoginPage = () => {
     };
 
     axios.post(SERVER_URL + "/auth/login", data, { withCredentials: true }).then((result) => {
-      console.log("result", result);
       localStorage.setItem("user", JSON.stringify(result.data));
       history.push("/conversation");
     });

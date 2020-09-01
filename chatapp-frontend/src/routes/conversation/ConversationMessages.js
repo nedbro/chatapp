@@ -3,12 +3,11 @@ import { Button, Grid } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
 import "./conversation.css";
+import Typography from "@material-ui/core/Typography";
 
 const ConversationMessages = ({ messages, sendMessage, currentUser }) => {
   const [messageToSend, setMessageToSend] = useState("");
   const messageList = messages.map((message) => {
-    console.log("message", message);
-    console.log("current user", currentUser);
     return (
       <Grid
         item
@@ -42,23 +41,33 @@ const ConversationMessages = ({ messages, sendMessage, currentUser }) => {
         className="fullHeight"
         direction="column"
       >
-        <Grid
-          item
-          xs={10}
-          container
-          direction="column"
-          justify="flex-end"
-          alignItems="stretch"
-          spacing={2}
-          className="fullWidth"
-        >
-          {messageList}
-        </Grid>
-        <Grid item>
-          <Input value={messageToSend} onChange={updateMessageToSend} />
-          <Button variant="contained" onClick={handleSendClick}>Send</Button>
-        </Grid>
+        {messageList && messageList.length > 0 ?
+          (<>
+            <Grid
+              item
+              xs={10}
+              container
+              direction="column"
+              justify="flex-end"
+              alignItems="stretch"
+              spacing={2}
+              className="fullWidth"
+            >
+              {messageList}
+            </Grid>
+            <Grid item>
+              <Input value={messageToSend} onChange={updateMessageToSend} />
+              <Button variant="contained" onClick={handleSendClick}>Send</Button>
+            </Grid>
+          </>) :
+          <Grid item container xs={6} className="fullHeight fullWidth" alignItems="flex-end" justify="center">
+            <Typography variant="h3" gutterBottom align="center">
+              Start a new conversation
+            </Typography>
+          </Grid>
+        }
       </Grid>
+
 
     </Grid>
   );

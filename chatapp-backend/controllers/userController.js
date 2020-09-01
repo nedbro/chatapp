@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userService = require("../services/userService");
+const conversationService = require("../services/conversationService");
 const { checkNotAuthenticated } = require("../services/loginService");
 const { checkAuthenticated } = require("../services/loginService");
 const { body, validationResult, check } = require("express-validator");
@@ -31,6 +32,15 @@ router.post("/", [
     }
   }
 
+]);
+
+router.get("/:id/conversations", [
+  checkAuthenticated,
+  async (req, res, next) => {
+    const user = await userService.getUserById(req.params.id);
+    const conversations = await conversationService.getConversationsOfUser(user);
+    res.json(conversations);
+  }
 ]);
 
 module.exports = router;

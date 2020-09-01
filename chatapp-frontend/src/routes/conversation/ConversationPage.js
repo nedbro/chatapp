@@ -17,24 +17,32 @@ const ConversationPage = () => {
   useEffect(() => {
     if (user === null) {
       history.push("/login");
+    } else {
+      setCurrentUser(user);
     }
   }, []);
 
 
   useEffect(() => {
-    axios.get(SERVER_URL + "/conversations").then((result) => {
+    axios.get(SERVER_URL + "/users/" + currentUser["_id"] + "/conversations", { withCredentials: true }).then((result) => {
       const conversationData = result.data;
 
-      setConversations(result.data);
-      setCurrentConversation(conversationData[0]);
-      setCurrentMessages(conversationData[0].messages);
-      setCurrentUser(conversationData[0].participants[0]);
+      if (conversationData && conversationData.length > 0) {
+        setConversations(result.data);
+        setCurrentConversation(conversationData[0]);
+        setCurrentMessages(conversationData[0].messages);
+      }
+    }).catch((error) => {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("user");
+        history.push("/login");
+      }
     });
   }, []);
 
   const getConversation = (conversationId) => {
     return axios
-      .get(SERVER_URL + "/conversations/" + conversationId);
+      .get(SERVER_URL + "/conversations/" + conversationId, { withCredentials: true });
   };
 
   const sendMessage = (message) => {
@@ -43,13 +51,27 @@ const ConversationPage = () => {
       messageText: message
     };
 
-    axios.post(SERVER_URL + "/conversations/" + currentConversation["_id"], messageToSend).then(() => {
-      getConversation(currentConversation["_id"]).then((result) => {
-        const conversationData = result.data;
-        setCurrentConversation(conversationData);
-        setCurrentMessages(conversationData.messages);
+    axios.post(SERVER_URL + "/conversations/" + currentConversation["_id"], messageToSend, { withCredentials: true })
+      .then(() => {
+        getConversation(currentConversation["_id"])
+          .then((result) => {
+            const conversationData = result.data;
+            setCurrentConversation(conversationData);
+            setCurrentMessages(conversationData.messages);
+          })
+          .catch((error) => {
+            if (error.response && error.response.status === 401) {
+              localStorage.removeItem("user");
+              history.push("/login");
+            }
+          });
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("user");
+          history.push("/login");
+        }
       });
-    });
   };
 
   const selectConversation = (conversation) => {

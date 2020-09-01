@@ -16,7 +16,7 @@ const mainRouter = require("./controllers/mainRouter");
 const db = require("./config/db");
 const app = express();
 
-app.use(cors({ credentials: true, origin: "localhost:3001" }));
+app.use(cors({ credentials: true, origin: "http://localhost:3001" }));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
