@@ -37,9 +37,23 @@ router.post("/", [
 router.get("/:id/conversations", [
   checkAuthenticated,
   async (req, res, next) => {
-    const user = await userService.getUserById(req.params.id);
-    const conversations = await conversationService.getConversationsOfUser(user);
-    res.json(conversations);
+    try {
+      const user = await userService.getUserById(req.params.id);
+      console.log("user", user);
+      const conversations = await conversationService.getConversationsOfUser(user);
+      res.json(conversations);
+    } catch (error) {
+      next(error);
+    }
+  }
+]);
+
+router.get("/:id/newConversations", [
+  checkAuthenticated,
+  (req, res, next) => {
+    userService.getNewUsersForConversations(req.params.id)
+      .then(users => res.json(users))
+      .catch((error) => next(error));
   }
 ]);
 

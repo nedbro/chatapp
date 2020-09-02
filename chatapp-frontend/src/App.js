@@ -23,6 +23,9 @@ function App() {
             <Route path="/conversation" exact>
               <ConversationPage />
             </Route>
+            <Route path="/">
+              <LoginPage />
+            </Route>
           </Switch>
         </Grid>
       </div>

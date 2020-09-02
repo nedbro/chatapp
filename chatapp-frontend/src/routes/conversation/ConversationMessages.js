@@ -5,7 +5,7 @@ import Chip from "@material-ui/core/Chip";
 import "./conversation.css";
 import Typography from "@material-ui/core/Typography";
 
-const ConversationMessages = ({ messages, sendMessage, currentUser }) => {
+const ConversationMessages = ({ messages, sendMessage, currentUser, messagesVisible }) => {
   const [messageToSend, setMessageToSend] = useState("");
   const messageList = messages.map((message) => {
     return (
@@ -41,7 +41,7 @@ const ConversationMessages = ({ messages, sendMessage, currentUser }) => {
         className="fullHeight"
         direction="column"
       >
-        {messageList && messageList.length > 0 ?
+        {messageList && messagesVisible ?
           (<>
             <Grid
               item
@@ -62,7 +62,7 @@ const ConversationMessages = ({ messages, sendMessage, currentUser }) => {
           </>) :
           <Grid item container xs={6} className="fullHeight fullWidth" alignItems="flex-end" justify="center">
             <Typography variant="h3" gutterBottom align="center">
-              Start a new conversation
+              Start a new conversation or select and existing one
             </Typography>
           </Grid>
         }

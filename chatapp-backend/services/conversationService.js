@@ -39,11 +39,13 @@ exports.createConversation = (conversation) => {
     const users = await User.find().where("_id").in(conversation.users);
     if (users.length < 2) {
       reject({ errors: { message: "The user input is incorrect" } });
+      return;
     }
 
     const conversations = await Conversation.find({ participants: users });
     if (conversations.length !== 0) {
       reject({ errors: { message: "This conversation already exists" } });
+      return;
     }
 
     const newConversations = new Conversation({
@@ -55,6 +57,7 @@ exports.createConversation = (conversation) => {
     newConversations.save((error) => {
       if (error) {
         reject({ errors: { ...error, message: "There was an error while saving the conversation" } });
+        return;
       }
       resolve();
     });
@@ -128,11 +131,13 @@ exports.sendMessage = (id, messageInput) => {
           message.save((error) => {
             if (error) {
               reject({ errors: { ...error, message: "There was an error while saving the message" } });
+              return;
             }
             conversation.messages.push(message);
             conversation.save((error) => {
               if (error) {
                 reject({ errors: { ...error, message: "There was an error while saving the conversation" } });
+                return;
               }
               resolve();
             });
@@ -144,14 +149,13 @@ exports.sendMessage = (id, messageInput) => {
 
 exports.getConversationsOfUser = (user) => {
   return new Promise((resolve, reject) => {
-    Conversation.find({ participants: [user["_id"]] })
-      .populate(["participants", "messages"])
+    Conversation.find().where("participants").in([user])
+      .populate("messages participants")
       .exec((error, conversations) => {
         if (error) {
           reject(error);
-        } else {
-          resolve(conversations);
         }
+        resolve(conversations);
       });
   });
 };

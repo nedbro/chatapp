@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Conversation = require("../models/conversation");
 const bcrypt = require("bcrypt");
 
 exports.getAllUsers = () => {
@@ -55,3 +56,54 @@ exports.getUserById = (id) => {
       });
   });
 };
+
+exports.getNewUsersForConversations = (userId) => {
+  return new Promise(async (resolve, reject) => {
+    let currentUser;
+    try {
+      currentUser = await this.getUserById(userId);
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    if (currentUser === null || currentUser === undefined) {
+      reject({ message: "User not found" });
+      return;
+    }
+    console.log("currentUser", currentUser);
+    Conversation
+      .find({ "participants": currentUser })
+      .populate("participants")
+      .exec((error, conversations) => {
+        console.log("conversations", conversations);
+        if (error) {
+          reject({ errors: error });
+          return;
+        }
+
+        if (conversations) {
+          let usersToRemove = new Set();
+
+          conversations.forEach(conversation => conversation.participants.forEach(user => usersToRemove.add(user)));
+          usersToRemove = [...usersToRemove];
+
+          console.log("usersToRemove", usersToRemove);
+          User.find().exec((error, users) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            if (users) {
+              console.log("users before", users);
+              users = users.filter(user => !usersToRemove.includes(user));
+              console.log("usersAfter", users);
+            }
+            resolve(users);
+          });
+        }
+      });
+  });
+};
+
+

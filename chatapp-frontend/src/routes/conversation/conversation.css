@@ -8,3 +8,8 @@
     background-color: #80d6ff;
 }
 
+.userPaper {
+    width: 90% !important;
+    height: 70% !important;
+    text-align: center;
+}
