@@ -1,28 +1,12 @@
 const Message = require("../models/message");
 
-exports.getAllMessages = () => {
-  return new Promise((resolve, reject) => {
-    Message.find()
-      .exec((error, messages) => {
-        if (error) {
-          reject({ errors: { ...error } });
-        } else {
-          resolve(messages);
-        }
-      });
-  });
+exports.getAllMessages = async () => {
+  return await Message.find();
 };
 
-exports.createMessage = (message) => {
-  return new Promise((resolve, reject) => {
-    const newMessage = new Message({
-      text: message.text
-    });
-    newMessage.save((error) => {
-      if (error) {
-        reject({ errors: { ...error } });
-      }
-      resolve(newMessage);
-    });
+exports.createMessage = async (message) => {
+  const newMessage = new Message({
+    text: message.text
   });
+  await newMessage.save();
 };
