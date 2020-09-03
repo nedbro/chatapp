@@ -39,7 +39,6 @@ router.get("/:id/conversations", [
   async (req, res, next) => {
     try {
       const user = await userService.getUserById(req.params.id);
-      console.log("user", user);
       const conversations = await conversationService.getConversationsOfUser(user);
       res.json(conversations);
     } catch (error) {

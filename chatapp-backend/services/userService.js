@@ -71,12 +71,10 @@ exports.getNewUsersForConversations = (userId) => {
       reject({ message: "User not found" });
       return;
     }
-    console.log("currentUser", currentUser);
     Conversation
       .find({ "participants": currentUser })
       .populate("participants")
       .exec((error, conversations) => {
-        console.log("conversations", conversations);
         if (error) {
           reject({ errors: error });
           return;
@@ -86,20 +84,19 @@ exports.getNewUsersForConversations = (userId) => {
           let usersToRemove = new Set();
 
           conversations.forEach(conversation => conversation.participants.forEach(user => usersToRemove.add(user)));
+          usersToRemove.add(currentUser);
           usersToRemove = [...usersToRemove];
 
-          console.log("usersToRemove", usersToRemove);
           User.find().exec((error, users) => {
             if (error) {
               reject(error);
               return;
             }
+
             if (users) {
-              console.log("users before", users);
-              users = users.filter(user => !usersToRemove.includes(user));
-              console.log("usersAfter", users);
+              const filteredUsers = users.filter(user => !usersToRemove.some(element => element._id.toString() === user._id.toString()));
+              resolve(filteredUsers);
             }
-            resolve(users);
           });
         }
       });

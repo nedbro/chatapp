@@ -26,7 +26,7 @@ const ConversationPage = () => {
 
   useEffect(() => {
     if (currentUser["_id"]) {
-      axios.get(SERVER_URL + "/users/" + currentUser["_id"] + "/conversations", { withCredentials: true }).then((result) => {
+      getAllConversations().then((result) => {
         const conversationData = result.data;
 
         if (conversationData && conversationData.length > 0) {
@@ -48,6 +48,10 @@ const ConversationPage = () => {
       .get(SERVER_URL + "/conversations/" + conversationId, { withCredentials: true });
   };
 
+  const getAllConversations = () => {
+    return axios.get(SERVER_URL + "/users/" + currentUser["_id"] + "/conversations", { withCredentials: true });
+  };
+
   const sendMessage = (message) => {
     const messageToSend = {
       sender: currentUser["_id"],
@@ -60,7 +64,7 @@ const ConversationPage = () => {
           .then((result) => {
             const conversationData = result.data;
             setCurrentConversation(conversationData);
-            setCurrentMessages(conversationData.messages);
+            setCurrentMessages(conversationData.messages || []);
           })
           .catch((error) => {
             if (error.response && error.response.status === 401) {
@@ -78,8 +82,25 @@ const ConversationPage = () => {
   };
 
   const selectConversation = (conversation) => {
-    setCurrentConversation(conversation);
-    setCurrentMessages(conversation.messages);
+    getAllConversations().then((result) => {
+      const conversationData = result.data;
+
+      if (conversationData && conversationData.length > 0) {
+        setConversations(result.data);
+        result.data.forEach((returnedConversation) => {
+          if (returnedConversation["_id"] === conversation["_id"]) {
+            setCurrentConversation(returnedConversation);
+            setCurrentMessages(returnedConversation.messages);
+            setMessagesVisible(true);
+          }
+        });
+      }
+    }).catch((error) => {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("user");
+        history.push("/login");
+      }
+    });
   };
 
   return (

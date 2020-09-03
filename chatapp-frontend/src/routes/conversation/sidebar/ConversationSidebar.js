@@ -22,14 +22,15 @@ const ConversationSidebar = ({ conversations, selectConversation, currentUser, s
     axios
       .post(SERVER_URL + "/conversations", conversationData, { withCredentials: true })
       .then((response) => {
-        setConversationsVisible(false);
+        setConversationsVisible(true);
         selectConversation(response.data);
-      }).catch((error) => {
-      if (error.response && error.response.status === 401) {
-        localStorage.removeItem("user");
-        history.push("/login");
-      }
-    });
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("user");
+          history.push("/login");
+        }
+      });
   };
 
   return (

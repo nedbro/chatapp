@@ -59,7 +59,7 @@ exports.createConversation = (conversation) => {
         reject({ errors: { ...error, message: "There was an error while saving the conversation" } });
         return;
       }
-      resolve();
+      resolve(newConversations);
     });
   });
 };
@@ -82,7 +82,7 @@ exports.deleteConversation = (id) => {
               return;
             }
 
-            Conversation.deleteOne({ id: mongoose.ObjectId(conversation._id, {}) }, () => {
+            Conversation.deleteOne({ _id: conversation._id }, () => {
               if (error) {
                 reject({ errors: { ...error, message: "There was an error during the conversation deletion" } });
                 return;
@@ -92,7 +92,7 @@ exports.deleteConversation = (id) => {
 
           });
         } else {
-          Conversation.deleteOne({ id: mongoose.ObjectId(conversation._id, {}) }, () => {
+          Conversation.deleteOne({ _id: conversation._id }, () => {
             if (error) {
               reject({ errors: { ...error, message: "There was an error during the conversation deletion" } });
               return;
