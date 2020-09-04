@@ -10,7 +10,6 @@ const ConversationPage = () => {
   const [currentConversation, setCurrentConversation] = useState("");
   const [currentUser, setCurrentUser] = useState({});
   const [conversations, setConversations] = useState([]);
-  const [currentMessages, setCurrentMessages] = useState([]);
   const [messagesVisible, setMessagesVisible] = useState(true);
   const history = useHistory();
   const user = localStorage.getItem("user");
@@ -23,16 +22,14 @@ const ConversationPage = () => {
     }
   }, []);
 
-
   useEffect(() => {
     if (currentUser["_id"]) {
       getAllConversations().then((result) => {
-        const conversationData = result.data;
+        const returnedConversations = result.data;
 
-        if (conversationData && conversationData.length > 0) {
+        if (returnedConversations && returnedConversations.length > 0) {
           setConversations(result.data);
-          setCurrentConversation(conversationData[0]);
-          setCurrentMessages(conversationData[0].messages);
+          setCurrentConversation(returnedConversations[0]);
         }
       }).catch((error) => {
         if (error.response && error.response.status === 401) {
@@ -52,55 +49,41 @@ const ConversationPage = () => {
     return axios.get(SERVER_URL + "/users/" + currentUser["_id"] + "/conversations", { withCredentials: true });
   };
 
-  const sendMessage = (message) => {
+  const sendMessage = async (message) => {
     const messageToSend = {
       sender: currentUser["_id"],
       messageText: message
     };
+    try {
+      await axios.post(SERVER_URL + "/conversations/" + currentConversation["_id"], messageToSend, { withCredentials: true });
+      const conversationResponse = await getConversation(currentConversation["_id"]);
+      const updatedCurrentConversation = conversationResponse.data;
+      setCurrentConversation(updatedCurrentConversation);
 
-    axios.post(SERVER_URL + "/conversations/" + currentConversation["_id"], messageToSend, { withCredentials: true })
-      .then(() => {
-        getConversation(currentConversation["_id"])
-          .then((result) => {
-            const conversationData = result.data;
-            setCurrentConversation(conversationData);
-            setCurrentMessages(conversationData.messages || []);
-          })
-          .catch((error) => {
-            if (error.response && error.response.status === 401) {
-              localStorage.removeItem("user");
-              history.push("/login");
-            }
-          });
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem("user");
-          history.push("/login");
-        }
-      });
-  };
-
-  const selectConversation = (conversation) => {
-    getAllConversations().then((result) => {
-      const conversationData = result.data;
-
-      if (conversationData && conversationData.length > 0) {
-        setConversations(result.data);
-        result.data.forEach((returnedConversation) => {
-          if (returnedConversation["_id"] === conversation["_id"]) {
-            setCurrentConversation(returnedConversation);
-            setCurrentMessages(returnedConversation.messages);
-            setMessagesVisible(true);
-          }
-        });
-      }
-    }).catch((error) => {
+    } catch (error) {
       if (error.response && error.response.status === 401) {
         localStorage.removeItem("user");
         history.push("/login");
       }
-    });
+    }
+  };
+
+  const selectConversation = async (conversation) => {
+    try {
+      const response = await getAllConversations();
+      const allConversations = response.data;
+      if (allConversations && allConversations.length > 0) {
+        setConversations(allConversations);
+        const conversationToSelect = allConversations.find(element => element["_id"] === conversation["_id"]);
+        setCurrentConversation(conversationToSelect);
+        setMessagesVisible(true);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("user");
+        history.push("/login");
+      }
+    }
   };
 
   return (
@@ -112,7 +95,7 @@ const ConversationPage = () => {
         setMessagesVisible={setMessagesVisible}
       />
       <ConversationMessages
-        messages={currentMessages}
+        currentConversation={currentConversation || { messages: [] }}
         sendMessage={sendMessage}
         currentUser={currentUser}
         conversationSelected={!!currentConversation}

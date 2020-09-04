@@ -17,16 +17,18 @@ const LoginPage = () => {
     }
   }, []);
 
-  const login = () => {
+  const login = async () => {
     const data = {
       username: username,
       password: password
     };
-
-    axios.post(SERVER_URL + "/auth/login", data, { withCredentials: true }).then((result) => {
-      localStorage.setItem("user", JSON.stringify(result.data));
+    try {
+      const loginResponse = await axios.post(SERVER_URL + "/auth/login", data, { withCredentials: true });
+      localStorage.setItem("user", JSON.stringify(loginResponse.data));
       history.push("/conversation");
-    });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (<div>

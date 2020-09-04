@@ -5,9 +5,9 @@ import Chip from "@material-ui/core/Chip";
 import "./conversation.css";
 import Typography from "@material-ui/core/Typography";
 
-const ConversationMessages = ({ messages, sendMessage, currentUser, messagesVisible }) => {
+const ConversationMessages = ({ currentConversation, sendMessage, currentUser, messagesVisible }) => {
   const [messageToSend, setMessageToSend] = useState("");
-  const messageList = messages.map((message) => {
+  const messageList = currentConversation.messages.map((message) => {
     return (
       <Grid
         item

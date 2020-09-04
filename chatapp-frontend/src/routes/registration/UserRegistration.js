@@ -26,21 +26,20 @@ const UserRegistration = () => {
     setPassword(event.target.value);
   };
 
-  const saveUser = () => {
+  const saveUser = async () => {
     const userToSave = {
       username: username,
       password: password
     };
-
-    axios
-      .post(SERVER_URL + "/users", userToSave, { withCredentials: true })
-      .then((response) => console.log("user mentés sikeres volt"))
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          localStorage.removeItem("user");
-          history.push("/login");
-        }
-      });
+    try {
+      await axios.post(SERVER_URL + "/users", userToSave, { withCredentials: true });
+      history.push("/login");
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        localStorage.removeItem("user");
+        history.push("/login");
+      }
+    }
   };
 
   return (

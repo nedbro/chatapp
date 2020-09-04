@@ -20,14 +20,14 @@ exports.createConversation = async (conversation) => {
   const conversations = await Conversation.find({ participants: users });
   if (conversations.length !== 0) throw { message: "This conversation already exists" };
 
-  const newConversations = new Conversation({
+  const newConversation = new Conversation({
     name: conversation.name,
     participants: users,
     messages: []
   });
 
-  await newConversations.save();
-  resolve(newConversations);
+  await newConversation.save();
+  return newConversation;
 };
 
 exports.deleteConversation = async (id) => {

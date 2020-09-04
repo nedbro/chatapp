@@ -33,6 +33,17 @@ const ConversationSidebar = ({ conversations, selectConversation, currentUser, s
       });
   };
 
+  const handleConversationsTabClick = () => {
+    selectConversation(conversations[0]);
+    setMessagesVisible(true);
+    setConversationsVisible(true);
+  };
+
+  const handleNewPeopleTabClick = () => {
+    setMessagesVisible(false);
+    setConversationsVisible(false);
+  };
+
   return (
     <Grid item container direction="column" xs={2}>
       <Paper square>
@@ -42,17 +53,10 @@ const ConversationSidebar = ({ conversations, selectConversation, currentUser, s
           textColor="primary"
         >
           <Tab
-            label="Conversations" value={true} onClick={() => {
-            selectConversation(conversations[0]);
-            setMessagesVisible(true);
-            setConversationsVisible(true);
-          }}
+            label="Conversations" value={true} onClick={handleConversationsTabClick}
           />
           <Tab
-            label="New People" value={false} onClick={() => {
-            setMessagesVisible(false);
-            setConversationsVisible(false);
-          }}
+            label="New People" value={false} onClick={handleNewPeopleTabClick}
           />
         </Tabs>
       </Paper>
