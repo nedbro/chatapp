@@ -5,6 +5,7 @@ import { Grid } from "@material-ui/core";
 import ConversationSidebar from "./sidebar/ConversationSidebar";
 import ConversationMessages from "./ConversationMessages";
 import { useHistory } from "react-router-dom";
+import socketIOClient from "socket.io-client";
 
 const ConversationPage = () => {
   const [currentConversation, setCurrentConversation] = useState("");
@@ -19,6 +20,9 @@ const ConversationPage = () => {
       history.push("/login");
     } else {
       setCurrentUser(JSON.parse(user));
+      const socket = socketIOClient(SERVER_URL + "/");
+      socket.send("subscribeToConversations", JSON.parse(user)["_id"]);
+      return () => socket.disconnect();
     }
   }, []);
 
