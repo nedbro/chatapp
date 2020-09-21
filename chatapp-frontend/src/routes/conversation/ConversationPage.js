@@ -2,6 +2,7 @@ import { Grid } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import socketIOClient from "socket.io-client";
 import { SERVER_URL } from "../../utils/Constants";
 import UserContext from "../../utils/UserContext";
 import ConversationMessages from "./ConversationMessages";
@@ -18,20 +19,15 @@ const ConversationPage = () => {
     if (currentUser === null) {
       history.push("/login");
     } else if (currentUser && currentUser["_id"]) {
-      getAllConversations()
-        .then((result) => {
-          const returnedConversations = result.data;
+      const socket = socketIOClient(SERVER_URL + "/");
+      socket.emit("subscribeToConversations", currentUser["_id"]);
 
-          if (returnedConversations && returnedConversations.length > 0) {
-            setConversations(result.data);
-            setCurrentConversation(returnedConversations[0]);
-          }
-        })
-        .catch((error) => {
-          if (error.response && error.response.status === 401) {
-            logoutUser();
-          }
-        });
+      socket.on("sentCurrentUsersConversations", (data) => {
+        setConversations(data);
+        setCurrentConversation(data[0]);
+      });
+
+      return () => socket.disconnect();
     }
   }, [currentUser]);
 
