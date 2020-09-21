@@ -1,21 +1,31 @@
-import React, { useState } from "react";
 import { Button, Grid } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
-import "./conversation.css";
+import Input from "@material-ui/core/Input";
 import Typography from "@material-ui/core/Typography";
+import React, { useContext, useState } from "react";
+import UserContext from "../../utils/UserContext";
+import "./conversation.css";
 
-const ConversationMessages = ({ currentConversation, sendMessage, currentUser, messagesVisible }) => {
+const ConversationMessages = ({
+  currentConversation,
+  sendMessage,
+  messagesVisible,
+}) => {
+  const { currentUser, logoutUser } = useContext(UserContext);
   const [messageToSend, setMessageToSend] = useState("");
   const messageList = currentConversation.messages.map((message) => {
     return (
-      <Grid
-        item
-        container
-        className="fullWidth"
-        key={message["_id"]}
-      >
-        <Grid item xs={12} container justify={currentUser["_id"] === message.sender ? "flex-end" : "flex-start"}>
+      <Grid item container className="fullWidth" key={message["_id"]}>
+        <Grid
+          item
+          xs={12}
+          container
+          justify={
+            (currentUser ? currentUser["_id"] : null) === message.sender
+              ? "flex-end"
+              : "flex-start"
+          }
+        >
           <Chip label={message.text} className="message" />
         </Grid>
       </Grid>
@@ -31,18 +41,18 @@ const ConversationMessages = ({ currentConversation, sendMessage, currentUser, m
     setMessageToSend("");
   };
 
-
   return (
-    <Grid item container xs={10} justify="center" alignItems="center" className="fullHeight">
-      <Grid
-        item
-        container
-        xs={6}
-        className="fullHeight"
-        direction="column"
-      >
-        {messageList && messagesVisible ?
-          (<>
+    <Grid
+      item
+      container
+      xs={10}
+      justify="center"
+      alignItems="center"
+      className="fullHeight"
+    >
+      <Grid item container xs={6} className="fullHeight" direction="column">
+        {messageList && messagesVisible ? (
+          <>
             <Grid
               item
               xs={10}
@@ -57,18 +67,26 @@ const ConversationMessages = ({ currentConversation, sendMessage, currentUser, m
             </Grid>
             <Grid item>
               <Input value={messageToSend} onChange={updateMessageToSend} />
-              <Button variant="contained" onClick={handleSendClick}>Send</Button>
+              <Button variant="contained" onClick={handleSendClick}>
+                Send
+              </Button>
             </Grid>
-          </>) :
-          <Grid item container xs={6} className="fullHeight fullWidth" alignItems="flex-end" justify="center">
+          </>
+        ) : (
+          <Grid
+            item
+            container
+            xs={6}
+            className="fullHeight fullWidth"
+            alignItems="flex-end"
+            justify="center"
+          >
             <Typography variant="h3" gutterBottom align="center">
               Start a new conversation or select and existing one
             </Typography>
           </Grid>
-        }
+        )}
       </Grid>
-
-
     </Grid>
   );
 };

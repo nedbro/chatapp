@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from "react";
-import Input from "@material-ui/core/Input";
 import { Button, Grid } from "@material-ui/core";
+import Input from "@material-ui/core/Input";
 import axios from "axios";
-import { SERVER_URL } from "../../utils/Constants";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { SERVER_URL } from "../../utils/Constants";
+import UserContext from "../../utils/UserContext";
 
 const UserRegistration = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const history = useHistory();
-  const user = localStorage.getItem("user");
+  const { currentUser, logoutUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (user !== null) {
+    if (currentUser !== null) {
       history.push("/conversation");
     }
-  }, []);
+  }, [currentUser]);
 
   const updateUsername = (event) => {
     setUsername(event.target.value);
@@ -29,15 +30,16 @@ const UserRegistration = () => {
   const saveUser = async () => {
     const userToSave = {
       username: username,
-      password: password
+      password: password,
     };
     try {
-      await axios.post(SERVER_URL + "/users", userToSave, { withCredentials: true });
+      await axios.post(SERVER_URL + "/users", userToSave, {
+        withCredentials: true,
+      });
       history.push("/login");
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        localStorage.removeItem("user");
-        history.push("/login");
+        logoutUser();
       }
     }
   };

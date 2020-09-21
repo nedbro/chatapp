@@ -1,5 +1,5 @@
-import React from "react";
 import { Grid, Paper, Typography } from "@material-ui/core";
+import React from "react";
 
 const ConversationList = ({ conversations, selectConversation }) => {
   const conversationList = conversations.map((conversation) => {
@@ -14,23 +14,24 @@ const ConversationList = ({ conversations, selectConversation }) => {
         justify="center"
         alignItems="center"
       >
-        <Paper className="conversationPaper" onClick={() => selectConversation(conversation)}>
+        <Paper
+          className="conversationPaper"
+          onClick={() => selectConversation(conversation)}
+        >
           <Typography variant="h6" gutterBottom>
             {conversation.name}
           </Typography>
           <Typography variant="body1" gutterBottom>
-            {conversation.messages.slice(-1)[0] ? conversation.messages.slice(-1)[0].text : ""}
+            {conversation.messages.slice(-1)[0]
+              ? conversation.messages.slice(-1)[0].text
+              : ""}
           </Typography>
         </Paper>
       </Grid>
     );
   });
 
-  return (
-    <>
-      {conversationList}
-    </>
-  );
+  return <>{conversationList}</>;
 };
 
 export default ConversationList;

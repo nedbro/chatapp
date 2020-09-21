@@ -1,46 +1,55 @@
-import React, { useEffect, useState } from "react";
-import Input from "@material-ui/core/Input";
 import { Button } from "@material-ui/core";
+import Input from "@material-ui/core/Input";
 import axios from "axios";
-import { SERVER_URL } from "../../utils/Constants";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { SERVER_URL } from "../../utils/Constants";
+import UserContext from "../../utils/UserContext";
 
-const LoginPage = () => {
+const LoginPage = ({ saveLoggedInUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const history = useHistory();
-  const user = localStorage.getItem("user");
+  const { currentUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (user !== null) {
+    if (currentUser !== null) {
       history.push("/conversation");
     }
-  }, []);
+  }, [currentUser]);
 
   const login = async () => {
     const data = {
       username: username,
-      password: password
+      password: password,
     };
     try {
-      const loginResponse = await axios.post(SERVER_URL + "/auth/login", data, { withCredentials: true });
-      localStorage.setItem("user", JSON.stringify(loginResponse.data));
+      const loginResponse = await axios.post(SERVER_URL + "/auth/login", data, {
+        withCredentials: true,
+      });
+      saveLoggedInUser(loginResponse.data);
       history.push("/conversation");
     } catch (error) {
       console.log(error);
     }
   };
 
-  return (<div>
+  return (
+    <div>
       <form>
-        <Input value={username} onChange={(event) => setUsername(event.target.value)} />
+        <Input
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
         <br />
-        <Input value={password} onChange={(event) => setPassword(event.target.value)} />
+        <Input
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
         <Button onClick={login}>Login</Button>
       </form>
     </div>
   );
 };
-
 
 export default LoginPage;
