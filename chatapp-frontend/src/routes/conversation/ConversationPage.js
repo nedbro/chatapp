@@ -75,6 +75,7 @@ const ConversationPage = () => {
     try {
       const response = await getAllConversations();
       const allConversations = response.data;
+      console.log(allConversations);
       if (allConversations && allConversations.length > 0) {
         setConversations(allConversations);
         const conversationToSelect = allConversations.find(
@@ -96,6 +97,7 @@ const ConversationPage = () => {
         conversations={conversations}
         selectConversation={selectConversation}
         setMessagesVisible={setMessagesVisible}
+        currentConversation={currentConversation}
       />
       <ConversationMessages
         currentConversation={currentConversation || { messages: [] }}

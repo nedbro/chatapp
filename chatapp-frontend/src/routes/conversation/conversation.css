@@ -4,6 +4,10 @@
     text-align: center;
 }
 
+.selectedConversationPaper {
+    background-color: #80d6ff;
+}
+
 .message {
     background-color: #80d6ff;
 }

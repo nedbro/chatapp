@@ -13,6 +13,7 @@ const ConversationSidebar = ({
   conversations,
   selectConversation,
   setMessagesVisible,
+  currentConversation
 }) => {
   const [conversationsVisible, setConversationsVisible] = useState(true);
   const { currentUser, logoutUser } = useContext(UserContext);
@@ -73,6 +74,7 @@ const ConversationSidebar = ({
         <ConversationList
           conversations={conversations}
           selectConversation={selectConversation}
+          currentConversation={currentConversation}
         />
       ) : (
         <ConversationStart startConversation={startConversation} />

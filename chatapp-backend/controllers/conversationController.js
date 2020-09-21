@@ -6,7 +6,7 @@ const { body, validationResult, check } = require("express-validator");
 
 
 router.get("/", checkAuthenticated, (req, res, next) => {
-  conversationService.getAllConversations().then(
+  conversationService.getConversationsOfUser(req.user).then(
     conversations => res.json(conversations),
     error => next(error)
   );

@@ -4,13 +4,11 @@ const User = require("../models/user");
 const Message = require("../models/message");
 
 exports.getAllConversations = async () => {
-  return Conversation.find()
-    .populate(["participants", "messages"]);
+  return Conversation.find().populate(["participants", "messages"]);
 };
 
 exports.getConversation = async (id) => {
-  return Conversation.findById(id)
-    .populate(["participants", "messages"]);
+  return Conversation.findById(id).populate(["participants", "messages"]);
 };
 
 exports.createConversation = async (conversation) => {
@@ -18,12 +16,13 @@ exports.createConversation = async (conversation) => {
   if (users.length < 2) throw { message: "The user input is incorrect" };
 
   const conversations = await Conversation.find({ participants: users });
-  if (conversations.length !== 0) throw { message: "This conversation already exists" };
+  if (conversations.length !== 0)
+    throw { message: "This conversation already exists" };
 
   const newConversation = new Conversation({
     name: conversation.name,
     participants: users,
-    messages: []
+    messages: [],
   });
 
   await newConversation.save();
@@ -31,10 +30,8 @@ exports.createConversation = async (conversation) => {
 };
 
 exports.deleteConversation = async (id) => {
-  const conversation = await Conversation
-    .findById(id)
-    .populate("messages");
-  if (!conversation) throw  { message: "The conversation doesn't exists" };
+  const conversation = await Conversation.findById(id).populate("messages");
+  if (!conversation) throw { message: "The conversation doesn't exists" };
   if (conversation.messages.length > 0) {
     await Message.deleteMany({ _id: conversation.messages });
   }
@@ -44,22 +41,27 @@ exports.deleteConversation = async (id) => {
 exports.sendMessage = async (id, messageInput) => {
   const conversation = await Conversation.findById(id);
   if (!conversation) {
-    throw  { message: "The conversation doesn't exists" };
+    throw { message: "The conversation doesn't exists" };
   }
 
   const sender = await User.findById(messageInput.sender);
 
   const message = new Message({
     text: messageInput.messageText,
-    sender: sender
+    sender: sender,
   });
 
   await message.save();
   conversation.messages.push(message);
+  conversation.last_active = message.sent_at;
   await conversation.save();
 };
 
 exports.getConversationsOfUser = async (user) => {
-  return await Conversation.find().where("participants").in([user])
-    .populate("messages participants");
+  return await Conversation.find()
+    .where("participants")
+    .in([user])
+    .populate("messages participants")
+    .sort({ last_active: -1 })
+    .limit(5);
 };

@@ -45,6 +45,7 @@ const LoginPage = ({ saveLoggedInUser }) => {
         <Input
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          type="password"
         />
         <Button onClick={login}>Login</Button>
       </form>

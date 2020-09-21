@@ -1,8 +1,14 @@
 import { Grid, Paper, Typography } from "@material-ui/core";
 import React from "react";
 
-const ConversationList = ({ conversations, selectConversation }) => {
+const ConversationList = ({
+  conversations,
+  selectConversation,
+  currentConversation,
+}) => {
   const conversationList = conversations.map((conversation) => {
+    const selected = currentConversation["_id"] === conversation["_id"];
+
     return (
       <Grid
         item
@@ -15,7 +21,9 @@ const ConversationList = ({ conversations, selectConversation }) => {
         alignItems="center"
       >
         <Paper
-          className="conversationPaper"
+          className={`conversationPaper ${
+            selected ? "selectedConversationPaper" : ""
+          }`}
           onClick={() => selectConversation(conversation)}
         >
           <Typography variant="h6" gutterBottom>
