@@ -2,7 +2,7 @@ import { Button } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { SERVER_URL } from "../../utils/Constants";
 import UserContext from "../../utils/UserContext";
 
@@ -48,6 +48,7 @@ const LoginPage = ({ saveLoggedInUser }) => {
           type="password"
         />
         <Button onClick={login}>Login</Button>
+        <Button> <Link to="/registration">Register</Link></Button>
       </form>
     </div>
   );

@@ -14,6 +14,7 @@ const UserRegistration = () => {
   const { currentUser, logoutUser } = useContext(UserContext);
 
   useEffect(() => {
+    console.log("currentUser", currentUser);
     if (currentUser !== null) {
       history.push("/conversation");
     }

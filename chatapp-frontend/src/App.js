@@ -25,7 +25,6 @@ function App() {
   const [contextValue, setContextValue] = useState(defaultContextValue);
 
   useEffect(() => {
-    console.log("userfromstorage", user);
     if (user === null) {
       history.push("/login");
     } else {

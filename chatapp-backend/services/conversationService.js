@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Conversation = require("../models/conversation");
 const User = require("../models/user");
 const Message = require("../models/message");
+const validator = require("validator");
 
 exports.getAllConversations = async () => {
   return Conversation.find().populate(["participants", "messages"]);
@@ -38,17 +39,11 @@ exports.deleteConversation = async (id) => {
   await Conversation.deleteOne({ _id: conversation._id });
 };
 
-exports.sendMessage = async (id, messageInput) => {
-  const conversation = await Conversation.findById(id);
-  if (!conversation) {
-    throw { message: "The conversation doesn't exists" };
-  }
-
-  const sender = await User.findById(messageInput.sender);
-
+exports.sendMessage = async (conversation, messageInput) => {
+ 
   const message = new Message({
     text: messageInput.messageText,
-    sender: sender,
+    sender: messageInput.sender,
   });
 
   await message.save();
@@ -64,4 +59,27 @@ exports.getConversationsOfUser = async (user) => {
     .populate("messages participants")
     .sort({ last_active: -1 })
     .limit(5);
+};
+
+exports.validateSendMessageInput = async (conversationId, messageInput) => {
+  if (!messageInput || validator.isEmpty(messageInput.messageText)) return false;
+
+  let conversation;
+  let sender;
+
+  try {
+    conversation = await Conversation.findById(conversationId);
+  } catch (error) {
+    return false;
+  }
+
+  try {
+    sender = await User.findById(messageInput.sender);
+  } catch (error) {
+    return false;
+  }
+
+  messageInput.sender = sender;
+
+  return {conversation, messageInput}
 };
