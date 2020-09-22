@@ -13,7 +13,8 @@ const ConversationSidebar = ({
   conversations,
   selectConversation,
   setMessagesVisible,
-  currentConversation
+  currentConversation,
+  socket,
 }) => {
   const [conversationsVisible, setConversationsVisible] = useState(true);
   const { currentUser, logoutUser } = useContext(UserContext);
@@ -29,8 +30,9 @@ const ConversationSidebar = ({
         withCredentials: true,
       })
       .then((response) => {
-        setConversationsVisible(true);
+        socket.emit("subscribeToConversations", currentUser["_id"]);
         selectConversation(response.data);
+        setConversationsVisible(true);
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {

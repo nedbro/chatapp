@@ -40,7 +40,6 @@ exports.deleteConversation = async (id) => {
 };
 
 exports.sendMessage = async (conversation, messageInput) => {
- 
   const message = new Message({
     text: messageInput.messageText,
     sender: messageInput.sender,
@@ -61,8 +60,13 @@ exports.getConversationsOfUser = async (user) => {
     .limit(5);
 };
 
+exports.getConversationsOfUserForSubscribing = async (user) => {
+  return await Conversation.find().where("participants").in([user]);
+};
+
 exports.validateSendMessageInput = async (conversationId, messageInput) => {
-  if (!messageInput || validator.isEmpty(messageInput.messageText)) return false;
+  if (!messageInput || validator.isEmpty(messageInput.messageText))
+    return false;
 
   let conversation;
   let sender;
@@ -81,5 +85,5 @@ exports.validateSendMessageInput = async (conversationId, messageInput) => {
 
   messageInput.sender = sender;
 
-  return {conversation, messageInput}
+  return { conversation, messageInput };
 };

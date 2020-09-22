@@ -1,33 +1,29 @@
 const socket_io = require("socket.io");
 const io = socket_io();
 const { getUserById } = require("../services/userService");
-const { getConversationsOfUser } = require("../services/conversationService");
-
 const conversationService = require("../services/conversationService");
 
 io.on("connect", (socket, next) => {
-  console.log("session connected");
-
   socket.on("subscribeToConversations", async (userId) => {
     const user = await getUserById(userId);
-    const conversations = await getConversationsOfUser(user);
-    conversations.forEach((conversation) => {
-      socket.join(conversation["_id"]);
-      console.log("asd");
-    });
-    socket.emit("sentCurrentUsersConversations", conversations);
+    try {
+      const conversations = await conversationService.getConversationsOfUserForSubscribing(
+        user
+      );
+      conversations.forEach((conversation) => {
+        socket.join(conversation["_id"]);
+      });
+      socket.emit("subscribedToConversations");
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   socket.on("sendMessage", async (conversationId, messageInput) => {
-    console.log("conversationId", conversationId);
-    console.log("messageInput", messageInput);
-
     const validationResult = await conversationService.validateSendMessageInput(
       conversationId,
       messageInput
     );
-
-    console.log("validationResult", validationResult);
 
     if (validationResult) {
       try {
@@ -45,7 +41,9 @@ io.on("connect", (socket, next) => {
 
   socket.on("askForLatestConversations", async (userId) => {
     const user = await getUserById(userId);
-    const conversations = await getConversationsOfUser(user);
+    const conversations = await conversationService.getConversationsOfUser(
+      user
+    );
     socket.emit("sentCurrentUsersConversations", conversations);
   });
 

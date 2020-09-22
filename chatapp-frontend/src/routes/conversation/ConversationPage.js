@@ -35,6 +35,15 @@ const ConversationPage = () => {
     if (socket) {
       socket.emit("subscribeToConversations", currentUser["_id"]);
 
+      const interval = setInterval(() => {
+        socket.emit("subscribeToConversations", currentUser["_id"]);
+      }, 10000)
+      
+
+      socket.on("subscribedToConversations", () => {
+        socket.emit("askForLatestConversations", currentUser["_id"]);
+      });
+
       socket.on("sentCurrentUsersConversations", (data) => {
         updateConversations(data);
       });
@@ -43,13 +52,15 @@ const ConversationPage = () => {
         socket.emit("askForLatestConversations", currentUser["_id"]);
       });
 
-      return () => socket.disconnect();
+      return () => {
+        clearInterval(interval)
+        socket.disconnect();
+      }
     }
   }, [socket]);
 
   const updateConversations = (data) => {
     setConversations(data);
-    console.log("current", currentConversationRef.current);
     if (!currentConversationRef.current) {
       setCurrentConversation(data[0]);
     } else {
@@ -67,23 +78,6 @@ const ConversationPage = () => {
         sender: currentUser["_id"],
         messageText: message,
       };
-      // try {
-      //   await axios.post(
-      //     SERVER_URL + "/conversations/" + currentConversation["_id"],
-      //     messageToSend,
-      //     { withCredentials: true }
-      //   );
-      //   const conversationResponse = await getConversation(
-      //     currentConversation["_id"]
-      //   );
-      //   const updatedCurrentConversation = conversationResponse.data;
-      //   setCurrentConversation(updatedCurrentConversation);
-      // } catch (error) {
-      //   if (error.response && error.response.status === 401) {
-      //     logoutUser();
-      //   }
-      // }
-
       socket.emit("sendMessage", currentConversation["_id"], messageToSend);
     } else {
       console.log("socket", socket);
@@ -91,7 +85,11 @@ const ConversationPage = () => {
   };
 
   const selectConversation = (conversation) => {
-    setCurrentConversation(conversation);
+    conversations.forEach((element) => {
+      if (conversation["_id"] === element["_id"]) {
+        setCurrentConversation(element);
+      }
+    });
     setMessagesVisible(true);
   };
 
@@ -114,6 +112,7 @@ const ConversationPage = () => {
         selectConversation={selectConversation}
         setMessagesVisible={setMessagesVisible}
         currentConversation={currentConversation || { messages: [] }}
+        socket={socket}
       />
       <ConversationMessages
         currentConversation={currentConversation || { messages: [] }}
