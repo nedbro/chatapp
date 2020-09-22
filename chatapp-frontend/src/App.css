@@ -1,19 +1,32 @@
 .fullHeight {
-    height: 100%;
-    max-height: 100% !important;
+  height: 100%;
+  max-height: 100% !important;
 }
 
 .fullWidth {
-    width: 100%;
-    max-width: 100% !important;
+  width: 100%;
+  max-width: 100% !important;
 }
 
 body {
-    background-color: #f5f5f6;
+  background-color: #f5f5f6;
 }
 
-.alignCenter  {
-    display:flex;
-    align-items: center;
-    justify-content: center;
+.alignCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scrollable {
+  overflow-y: scroll;
+}
+
+.messageListWrapper {
+  height: 100vh !important;
+}
+
+.messageList {
+  overflow-y: scroll;
+  flex-wrap: nowrap;
 }

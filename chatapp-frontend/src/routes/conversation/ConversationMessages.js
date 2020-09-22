@@ -1,9 +1,7 @@
 import { Button, Grid, TextField } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
-import Input from "@material-ui/core/Input";
 import Typography from "@material-ui/core/Typography";
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
 import UserContext from "../../utils/UserContext";
 import "./conversation.css";
 
@@ -51,20 +49,19 @@ const ConversationMessages = ({
       alignItems="center"
       className="fullHeight"
     >
-      <Grid item container xs={6} className="fullHeight" direction="column">
+      <Grid item container xs={6} className="fullHeight messageListWrapper" direction="column">
         {messageList && messagesVisible ? (
           <>
             <Grid
               item
               xs={10}
               container
-              direction="column"
-              justify="flex-end"
+              direction="column-reverse"
               alignItems="stretch"
               spacing={2}
-              className="fullWidth"
+              className="fullWidth messageList"
             >
-              {messageList}
+              {messageList.reverse()}
             </Grid>
             <Grid item>
               <TextField
