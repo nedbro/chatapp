@@ -1,10 +1,12 @@
 import { CssBaseline, Grid, StylesProvider } from "@material-ui/core";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useHistory } from "react-router-dom";
 import "./App.css";
 import ConversationPage from "./routes/conversation/ConversationPage";
 import LoginPage from "./routes/login/LoginPage";
 import UserRegistartion from "./routes/registration/UserRegistration";
+import { SERVER_URL } from "./utils/Constants";
 import { UserProvider } from "./utils/UserContext";
 
 function App() {
@@ -14,7 +16,13 @@ function App() {
   const logoutUser = () => {
     setContextValue(defaultContextValue);
     localStorage.removeItem("user");
-    history.push("/login");
+
+    axios
+      .post(SERVER_URL + "/auth/logout", {
+        withCredentials: true,
+      })
+      .then(() => history.push("/login"))
+      .catch(() => history.push("/login"));
   };
 
   const defaultContextValue = {

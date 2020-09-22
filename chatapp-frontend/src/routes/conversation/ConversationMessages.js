@@ -1,8 +1,9 @@
-import { Button, Grid } from "@material-ui/core";
+import { Button, Grid, TextField } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
 import Typography from "@material-ui/core/Typography";
 import React, { useContext, useState } from "react";
+import { Link } from "react-router-dom";
 import UserContext from "../../utils/UserContext";
 import "./conversation.css";
 
@@ -66,10 +67,15 @@ const ConversationMessages = ({
               {messageList}
             </Grid>
             <Grid item>
-              <Input value={messageToSend} onChange={updateMessageToSend} />
+              <TextField
+                value={messageToSend}
+                onChange={updateMessageToSend}
+                mr={2}
+              />
               <Button variant="contained" onClick={handleSendClick}>
                 Send
               </Button>
+              <Button onClick={logoutUser}>Logout</Button>
             </Grid>
           </>
         ) : (

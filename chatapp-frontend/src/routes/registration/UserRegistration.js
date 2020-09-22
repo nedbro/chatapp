@@ -1,8 +1,7 @@
-import { Button, Grid } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
+import { Button, FormControl, TextField } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { SERVER_URL } from "../../utils/Constants";
 import UserContext from "../../utils/UserContext";
 
@@ -46,13 +45,24 @@ const UserRegistration = () => {
   };
 
   return (
-    <Grid container item xs={6} direction="column">
-      <Input value={username} onChange={updateUsername} />
-      <Input value={password} onChange={updatePassword} type="password" />
-      <Button variant="contained" onClick={saveUser}>
-        Save
-      </Button>
-    </Grid>
+    <div className="fullWidth fullHeight alignCenter">
+      <div>
+        <FormControl>
+          <TextField value={username} onChange={updateUsername} />
+          <TextField
+            value={password}
+            onChange={updatePassword}
+            type="password"
+          />
+          <Button variant="contained" onClick={saveUser}>
+            Save
+          </Button>
+          <Button>
+            <Link to="/login">Login</Link>
+          </Button>
+        </FormControl>
+      </div>
+    </div>
   );
 };
 

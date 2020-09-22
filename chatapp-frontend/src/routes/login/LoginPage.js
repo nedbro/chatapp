@@ -1,5 +1,4 @@
-import { Button } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
+import { Button, FormControl, TextField } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
@@ -35,21 +34,29 @@ const LoginPage = ({ saveLoggedInUser }) => {
   };
 
   return (
-    <div>
-      <form>
-        <Input
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-        />
-        <br />
-        <Input
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          type="password"
-        />
-        <Button onClick={login}>Login</Button>
-        <Button> <Link to="/registration">Register</Link></Button>
-      </form>
+    <div className="fullWidth fullHeight alignCenter">
+      <div>
+        <FormControl>
+          <TextField
+            value={username}
+            label="Username"
+            onChange={(event) => setUsername(event.target.value)}
+            m={1}
+          />
+          <br />
+          <TextField
+            value={password}
+            label="Password"
+            onChange={(event) => setPassword(event.target.value)}
+            type="password"
+            m={1}
+          />
+          <Button onClick={login}>Login</Button>
+          <Button>
+            <Link to="/registration">Register</Link>
+          </Button>
+        </FormControl>
+      </div>
     </div>
   );
 };
