@@ -1,9 +1,10 @@
-import { Button, FormControl, TextField } from "@material-ui/core";
+import { Box, Button, FormControl, Paper, TextField } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { SERVER_URL } from "../../utils/Constants";
 import UserContext from "../../utils/UserContext";
+import "./loginpage.css";
 
 const LoginPage = ({ saveLoggedInUser }) => {
   const [username, setUsername] = useState("");
@@ -34,29 +35,47 @@ const LoginPage = ({ saveLoggedInUser }) => {
   };
 
   return (
-    <div className="fullWidth fullHeight alignCenter">
-      <div>
-        <FormControl>
-          <TextField
-            value={username}
-            label="Username"
-            onChange={(event) => setUsername(event.target.value)}
-            m={1}
-          />
-          <br />
-          <TextField
-            value={password}
-            label="Password"
-            onChange={(event) => setPassword(event.target.value)}
-            type="password"
-            m={1}
-          />
-          <Button onClick={login}>Login</Button>
-          <Button>
-            <Link to="/registration">Register</Link>
-          </Button>
+    <div className="fullWidth fullHeight alignCenter loginBody">
+      <Box className="loginPaper">
+        <h2>Login</h2>
+        <FormControl className="loginForm">
+          <Box className="textFieldContainer">
+            <TextField
+              value={username}
+              label="Username"
+              className="loginPageTextField"
+              variant="outlined"
+              onChange={(event) => setUsername(event.target.value)}
+            />
+            <TextField
+              value={password}
+              label="Password"
+              className="loginPageTextField"
+              variant="outlined"
+              type="password"
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </Box>
+          <Box className="loginPageButtonContainer">
+            <Button
+              variant="outlined"
+              className="loginPageButton"
+              color="primary"
+              onClick={login}
+            >
+              Login
+            </Button>
+            <Button
+              className="loginPageButton"
+              variant="outlined"
+              color="secondary"
+              onClick={() => history.push("/registration")}
+            >
+              Register
+            </Button>
+          </Box>
         </FormControl>
-      </div>
+      </Box>
     </div>
   );
 };

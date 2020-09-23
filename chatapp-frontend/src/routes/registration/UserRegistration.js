@@ -1,9 +1,10 @@
-import { Button, FormControl, TextField } from "@material-ui/core";
+import { Box, Button, FormControl, TextField } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { SERVER_URL } from "../../utils/Constants";
 import UserContext from "../../utils/UserContext";
+import "../login/loginpage.css";
 
 const UserRegistration = () => {
   const [username, setUsername] = useState("");
@@ -45,23 +46,47 @@ const UserRegistration = () => {
   };
 
   return (
-    <div className="fullWidth fullHeight alignCenter">
-      <div>
-        <FormControl>
-          <TextField value={username} onChange={updateUsername} />
-          <TextField
-            value={password}
-            onChange={updatePassword}
-            type="password"
-          />
-          <Button variant="contained" onClick={saveUser}>
-            Save
-          </Button>
-          <Button>
-            <Link to="/login">Login</Link>
-          </Button>
+    <div className="fullWidth fullHeight alignCenter loginBody">
+      <Box className="loginPaper">
+        <h2>Registration</h2>
+        <FormControl className="loginForm">
+          <Box className="textFieldContainer">
+            <TextField
+              value={username}
+              label="Username"
+              className="loginPageTextField"
+              variant="outlined"
+              onChange={updateUsername}
+            />
+            <TextField
+              value={password}
+              label="Password"
+              onChange={updatePassword}
+              className="loginPageTextField"
+              variant="outlined"
+              type="password"
+            />
+          </Box>
+          <Box className="loginPageButtonContainer">
+            <Button
+              variant="outlined"
+              className="loginPageButton"
+              color="primary"
+              onClick={saveUser}
+            >
+              Save
+            </Button>
+            <Button
+              className="loginPageButton"
+              variant="outlined"
+              color="secondary"
+              onClick={() => history.push("/login")}
+            >
+              Login
+            </Button>
+          </Box>
         </FormControl>
-      </div>
+      </Box>
     </div>
   );
 };

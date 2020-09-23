@@ -1,4 +1,10 @@
-import { CssBaseline, Grid, StylesProvider } from "@material-ui/core";
+import { CssBaseline, Grid } from "@material-ui/core";
+import {
+  createMuiTheme,
+  responsiveFontSizes,
+  StylesProvider,
+  ThemeProvider,
+} from "@material-ui/core/styles";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Route, Switch, useHistory } from "react-router-dom";
@@ -8,6 +14,9 @@ import LoginPage from "./routes/login/LoginPage";
 import UserRegistartion from "./routes/registration/UserRegistration";
 import { SERVER_URL } from "./utils/Constants";
 import { UserProvider } from "./utils/UserContext";
+
+let theme = createMuiTheme();
+theme = responsiveFontSizes(theme);
 
 function App() {
   const history = useHistory();
@@ -54,29 +63,32 @@ function App() {
   };
 
   return (
-    <StylesProvider injectFirst>
-      <CssBaseline />
-      <div className="App fullHeight">
-        <Grid container className="fullHeight">
-          <UserProvider value={contextValue}>
-            <Switch>
-              <Route path="/registration" exact>
-                <UserRegistartion />
-              </Route>
-              <Route path="/login" exact>
-                <LoginPage saveLoggedInUser={saveLoggedInUser} />
-              </Route>
-              <Route path="/conversation" exact>
-                <ConversationPage />
-              </Route>
-              <Route path="/">
-                <LoginPage />
-              </Route>
-            </Switch>
-          </UserProvider>
-        </Grid>
-      </div>
-    </StylesProvider>
+    <>
+      <StylesProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <div className="App fullHeight">
+            <Grid container className="fullHeight">
+              <UserProvider value={contextValue}>
+                <Switch>
+                  <Route path="/registration" exact>
+                    <UserRegistartion />
+                  </Route>
+                  <Route path="/login" exact>
+                    <LoginPage saveLoggedInUser={saveLoggedInUser} />
+                  </Route>
+                  <Route path="/conversation" exact>
+                    <ConversationPage />
+                  </Route>
+                  <Route path="/">
+                    <LoginPage />
+                  </Route>
+                </Switch>
+              </UserProvider>
+            </Grid>
+          </div>
+        </ThemeProvider>
+      </StylesProvider>
+    </>
   );
 }
 
