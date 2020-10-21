@@ -71,7 +71,7 @@ function App() {
               <UserProvider value={contextValue}>
                 <Switch>
                   <Route path="/registration" exact>
-                    <UserRegistartion />
+                    <UserRegistartion saveLoggedInUser={saveLoggedInUser} />
                   </Route>
                   <Route path="/login" exact>
                     <LoginPage saveLoggedInUser={saveLoggedInUser} />

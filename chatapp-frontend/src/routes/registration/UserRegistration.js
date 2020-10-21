@@ -6,7 +6,7 @@ import { SERVER_URL } from "../../utils/Constants";
 import UserContext from "../../utils/UserContext";
 import "../login/loginpage.css";
 
-const UserRegistration = () => {
+const UserRegistration = ({ saveLoggedInUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -34,9 +34,14 @@ const UserRegistration = () => {
       password: password,
     };
     try {
-      await axios.post(SERVER_URL + "/users", userToSave, {
-        withCredentials: true,
-      });
+      const registrationResponse = await axios.post(
+        SERVER_URL + "/users",
+        userToSave,
+        {
+          withCredentials: true,
+        }
+      );
+      saveLoggedInUser(registrationResponse.data);
       history.push("/login");
     } catch (error) {
       if (error.response && error.response.status === 401) {
