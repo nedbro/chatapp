@@ -3,8 +3,8 @@ import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
 import axios from "axios";
 import React, { useContext, useState } from "react";
+import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
-import UserContext from "../../../utils/UserContext";
 import "../conversation.css";
 import ConversationList from "./ConversationList";
 import ConversationStart from "./ConversationStart";
@@ -17,12 +17,12 @@ const ConversationSidebar = ({
   socket,
 }) => {
   const [conversationsVisible, setConversationsVisible] = useState(true);
-  const { currentUser, logoutUser } = useContext(UserContext);
+  const { signedInUser, setSignedInUser } = useContext(AuthContext);
 
   const startConversation = (user) => {
     const conversationData = {
-      users: [currentUser["_id"], user["_id"]],
-      name: currentUser.username + " - " + user.username,
+      users: [signedInUser["_id"], user["_id"]],
+      name: signedInUser.username + " - " + user.username,
     };
 
     axios
@@ -30,13 +30,13 @@ const ConversationSidebar = ({
         withCredentials: true,
       })
       .then((response) => {
-        socket.emit("subscribeToConversations", currentUser["_id"]);
+        socket.emit("subscribeToConversations", signedInUser["_id"]);
         selectConversation(response.data);
         setConversationsVisible(true);
       })
       .catch((error) => {
         if (error.response && error.response.status === 401) {
-          logoutUser();
+          setSignedInUser(null);
         }
       });
   };

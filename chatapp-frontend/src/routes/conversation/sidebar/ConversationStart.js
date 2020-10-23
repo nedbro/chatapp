@@ -1,35 +1,25 @@
 import { Grid, Paper, Typography } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
-import UserContext from "../../../utils/UserContext";
 import "../conversation.css";
 
 const ConversationStart = ({ startConversation }) => {
   const [newConversationCards, setNewConversationCards] = useState("");
-  const { currentUser, logoutUser } = useContext(UserContext);
-  const history = useHistory();
+  const { signedInUser, setSignedInUser } = useContext(AuthContext);
 
   useEffect(() => {
-    if (currentUser === null) {
-      logoutUser();
-    } else {
-      axios
-        .get(
-          SERVER_URL + "/users/" + currentUser["_id"] + "/newConversations",
-          {
-            withCredentials: true,
-          }
-        )
-        .then((result) => createUserCards(result.data))
-        .catch((error) => {
-          if (error.response && error.response.status === 401) {
-            logoutUser();
-            history.push("/login");
-          }
-        });
-    }
+    axios
+      .get(SERVER_URL + "/users/" + signedInUser["_id"] + "/newConversations", {
+        withCredentials: true,
+      })
+      .then((result) => createUserCards(result.data))
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          setSignedInUser(null);
+        }
+      });
   }, []);
 
   const createUserCards = (users) => {

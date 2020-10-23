@@ -1,8 +1,10 @@
 import { Button, Grid, TextField } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
 import Typography from "@material-ui/core/Typography";
+import Axios from "axios";
 import React, { useContext, useState } from "react";
-import UserContext from "../../utils/UserContext";
+import { AuthContext } from "../../utils/AuthProvider";
+import { SERVER_URL } from "../../utils/Constants";
 import "./conversation.css";
 
 const ConversationMessages = ({
@@ -10,7 +12,7 @@ const ConversationMessages = ({
   sendMessage,
   messagesVisible,
 }) => {
-  const { currentUser, logoutUser } = useContext(UserContext);
+  const { signedInUser, setSignedInUser } = useContext(AuthContext);
   const [messageToSend, setMessageToSend] = useState("");
   const messageList = currentConversation.messages.map((message) => {
     return (
@@ -20,7 +22,7 @@ const ConversationMessages = ({
           xs={12}
           container
           justify={
-            (currentUser ? currentUser["_id"] : null) === message.sender
+            (signedInUser ? signedInUser["_id"] : null) === message.sender
               ? "flex-end"
               : "flex-start"
           }
@@ -40,6 +42,12 @@ const ConversationMessages = ({
     setMessageToSend("");
   };
 
+  const logout = () => {
+    Axios.delete(SERVER_URL + "/auth/logout", {
+      withCredentials: true,
+    }).finally(() => setSignedInUser(null));
+  };
+
   return (
     <Grid
       item
@@ -49,7 +57,13 @@ const ConversationMessages = ({
       alignItems="center"
       className="fullHeight"
     >
-      <Grid item container xs={6} className="fullHeight messageListWrapper" direction="column">
+      <Grid
+        item
+        container
+        xs={6}
+        className="fullHeight messageListWrapper"
+        direction="column"
+      >
         {messageList && messagesVisible ? (
           <>
             <Grid
@@ -72,7 +86,7 @@ const ConversationMessages = ({
               <Button variant="contained" onClick={handleSendClick}>
                 Send
               </Button>
-              <Button onClick={logoutUser}>Logout</Button>
+              <Button onClick={logout}>Logout</Button>
             </Grid>
           </>
         ) : (

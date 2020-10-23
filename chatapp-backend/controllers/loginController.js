@@ -18,8 +18,13 @@ router.delete("/logout", checkAuthenticated, (req, res, next) => {
   res.sendStatus(200);
 });
 
-router.get("/loginstatus", checkAuthenticated, (req, res, next) => {
-  res.sendStatus(200);
+router.get("/me", (req, res, next) => {
+  console.log(JSON.stringify(req.user));
+  if (req.isAuthenticated()) {
+    res.json({ username: req.user.username, _id: req.user["_id"] });
+  } else {
+    res.status(404);
+  }
 });
 
 module.exports = router;

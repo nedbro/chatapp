@@ -1,47 +1,37 @@
 import { Grid } from "@material-ui/core";
-import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
 import socketIOClient from "socket.io-client";
+import { AuthContext } from "../../utils/AuthProvider";
 import { SERVER_URL } from "../../utils/Constants";
-import UserContext from "../../utils/UserContext";
 import ConversationMessages from "./ConversationMessages";
 import ConversationSidebar from "./sidebar/ConversationSidebar";
 
 const ConversationPage = () => {
-  const { currentUser, logoutUser } = useContext(UserContext);
+  const { signedInUser } = useContext(AuthContext);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [messagesVisible, setMessagesVisible] = useState(true);
-  const history = useHistory();
   const [socket, setSocket] = useState(null);
 
   const currentConversationRef = useRef();
   currentConversationRef.current = currentConversation;
 
   useEffect(() => {
-    if (currentUser === null) {
-      history.push("/login");
-    } else if (currentUser && currentUser["_id"]) {
-      const isLoggedIn = checkLoginStatus();
-
-      if (isLoggedIn) {
-        setSocket(socketIOClient(SERVER_URL + "/"));
-      }
+    if (signedInUser && signedInUser["_id"]) {
+      setSocket(socketIOClient(SERVER_URL + "/"));
     }
-  }, [currentUser]);
+  }, []);
 
   useEffect(() => {
     if (socket) {
-      socket.emit("subscribeToConversations", currentUser["_id"]);
+      socket.emit("subscribeToConversations", signedInUser["_id"]);
 
       const interval = setInterval(() => {
-        socket.emit("subscribeToConversations", currentUser["_id"]);
-      }, 10000)
-      
+        socket.emit("subscribeToConversations", signedInUser["_id"]);
+      }, 10000);
 
       socket.on("subscribedToConversations", () => {
-        socket.emit("askForLatestConversations", currentUser["_id"]);
+        socket.emit("askForLatestConversations", signedInUser["_id"]);
       });
 
       socket.on("sentCurrentUsersConversations", (data) => {
@@ -49,13 +39,13 @@ const ConversationPage = () => {
       });
 
       socket.on("thereIsANewMessage", () => {
-        socket.emit("askForLatestConversations", currentUser["_id"]);
+        socket.emit("askForLatestConversations", signedInUser["_id"]);
       });
 
       return () => {
-        clearInterval(interval)
+        clearInterval(interval);
         socket.disconnect();
-      }
+      };
     }
   }, [socket]);
 
@@ -75,7 +65,7 @@ const ConversationPage = () => {
   const sendMessage = async (message) => {
     if (socket) {
       const messageToSend = {
-        sender: currentUser["_id"],
+        sender: signedInUser["_id"],
         messageText: message,
       };
       socket.emit("sendMessage", currentConversation["_id"], messageToSend);
@@ -91,18 +81,6 @@ const ConversationPage = () => {
       }
     });
     setMessagesVisible(true);
-  };
-
-  const checkLoginStatus = async () => {
-    try {
-      await axios.get(SERVER_URL + "/auth/loginstatus", {
-        withCredentials: true,
-      });
-      return true;
-    } catch (error) {
-      logoutUser();
-      return false;
-    }
   };
 
   return (

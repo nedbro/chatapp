@@ -1,43 +1,46 @@
-import { Box, Button, FormControl, Paper, TextField } from "@material-ui/core";
-import axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Box, Button, FormControl, TextField } from "@material-ui/core";
+import Axios from "axios";
+import React, { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { AuthContext } from "../../utils/AuthProvider";
 import { SERVER_URL } from "../../utils/Constants";
-import UserContext from "../../utils/UserContext";
-import "./loginpage.css";
+import "./auth.css";
 
-const LoginPage = ({ saveLoggedInUser }) => {
+const UserRegistration = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const history = useHistory();
-  const { currentUser } = useContext(UserContext);
+  const { setSignedInUser } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (currentUser !== null) {
-      history.push("/conversation");
-    }
-  }, [currentUser]);
+  const updateUsername = (event) => {
+    setUsername(event.target.value);
+  };
 
-  const login = async () => {
-    const data = {
+  const updatePassword = (event) => {
+    setPassword(event.target.value);
+  };
+
+  const saveUser = () => {
+    const userToSave = {
       username: username,
       password: password,
     };
-    try {
-      const loginResponse = await axios.post(SERVER_URL + "/auth/login", data, {
-        withCredentials: true,
-      });
-      saveLoggedInUser(loginResponse.data);
-      history.push("/conversation");
-    } catch (error) {
-      console.log(error);
-    }
+
+    Axios.post(SERVER_URL + "/users", userToSave, {
+      withCredentials: true,
+    })
+      .then((response) => {
+        setSignedInUser(response.data);
+        history.push("/conversation");
+      })
+      .catch(console.warn);
   };
 
   return (
     <div className="fullWidth fullHeight alignCenter loginBody">
       <Box className="loginPaper">
-        <h2>Login</h2>
+        <h2>Registration</h2>
         <FormControl className="loginForm">
           <Box className="textFieldContainer">
             <TextField
@@ -45,15 +48,15 @@ const LoginPage = ({ saveLoggedInUser }) => {
               label="Username"
               className="loginPageTextField"
               variant="outlined"
-              onChange={(event) => setUsername(event.target.value)}
+              onChange={updateUsername}
             />
             <TextField
               value={password}
               label="Password"
+              onChange={updatePassword}
               className="loginPageTextField"
               variant="outlined"
               type="password"
-              onChange={(event) => setPassword(event.target.value)}
             />
           </Box>
           <Box className="loginPageButtonContainer">
@@ -61,17 +64,17 @@ const LoginPage = ({ saveLoggedInUser }) => {
               variant="outlined"
               className="loginPageButton"
               color="primary"
-              onClick={login}
+              onClick={saveUser}
             >
-              Login
+              Save
             </Button>
             <Button
               className="loginPageButton"
               variant="outlined"
               color="secondary"
-              onClick={() => history.push("/registration")}
+              onClick={() => history.push("/login")}
             >
-              Register
+              Login
             </Button>
           </Box>
         </FormControl>
@@ -80,4 +83,4 @@ const LoginPage = ({ saveLoggedInUser }) => {
   );
 };
 
-export default LoginPage;
+export default UserRegistration;
