@@ -1,6 +1,7 @@
-import { Grid, Paper } from "@material-ui/core";
+import { Button, Grid, Paper, Typography } from "@material-ui/core";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
+import Axios from "axios";
 import axios from "axios";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../../utils/AuthProvider";
@@ -9,10 +10,9 @@ import "../conversation.css";
 import ConversationList from "./ConversationList";
 import ConversationStart from "./ConversationStart";
 
-const ConversationSidebar = ({
+const Sidebar = ({
   conversations,
   selectConversation,
-  setMessagesVisible,
   currentConversation,
   socket,
 }) => {
@@ -22,7 +22,7 @@ const ConversationSidebar = ({
   const startConversation = (user) => {
     const conversationData = {
       users: [signedInUser["_id"], user["_id"]],
-      name: signedInUser.username + " - " + user.username,
+      name: user.username,
     };
 
     axios
@@ -43,22 +43,29 @@ const ConversationSidebar = ({
 
   const handleConversationsTabClick = () => {
     selectConversation(conversations[0]);
-    setMessagesVisible(true);
     setConversationsVisible(true);
   };
 
   const handleNewPeopleTabClick = () => {
-    setMessagesVisible(false);
     setConversationsVisible(false);
   };
 
+  const logout = () => {
+    Axios.delete(SERVER_URL + "/auth/logout", {
+      withCredentials: true,
+    }).finally(() => setSignedInUser(null));
+  };
+
   return (
-    <Grid item container direction="column" xs={2}>
+    <Grid item container direction="column" xs={3}>
       <Paper square>
+        <Typography>{signedInUser.username}</Typography>
+        <Button onClick={logout}>Logout</Button>
         <Tabs
           value={conversationsVisible}
           indicatorColor="primary"
           textColor="primary"
+          variant="fullWidth"
         >
           <Tab
             label="Conversations"
@@ -85,4 +92,4 @@ const ConversationSidebar = ({
   );
 };
 
-export default ConversationSidebar;
+export default Sidebar;

@@ -6,6 +6,7 @@ const ConversationList = ({
   selectConversation,
   currentConversation,
 }) => {
+  console.log("conversations", conversations);
   const conversationList = conversations.map((conversation) => {
     const selected = currentConversation["_id"] === conversation["_id"];
 

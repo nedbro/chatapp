@@ -3,23 +3,20 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import socketIOClient from "socket.io-client";
 import { AuthContext } from "../../utils/AuthProvider";
 import { SERVER_URL } from "../../utils/Constants";
-import ConversationMessages from "./ConversationMessages";
-import ConversationSidebar from "./sidebar/ConversationSidebar";
+import MainSection from "./MainSection";
+import Sidebar from "./sidebar/Sidebar";
 
 const ConversationPage = () => {
   const { signedInUser } = useContext(AuthContext);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [conversations, setConversations] = useState([]);
-  const [messagesVisible, setMessagesVisible] = useState(true);
   const [socket, setSocket] = useState(null);
 
   const currentConversationRef = useRef();
   currentConversationRef.current = currentConversation;
 
   useEffect(() => {
-    if (signedInUser && signedInUser["_id"]) {
-      setSocket(socketIOClient(SERVER_URL + "/"));
-    }
+    setSocket(socketIOClient(SERVER_URL + "/"));
   }, []);
 
   useEffect(() => {
@@ -80,23 +77,19 @@ const ConversationPage = () => {
         setCurrentConversation(element);
       }
     });
-    setMessagesVisible(true);
   };
 
   return (
     <Grid item container>
-      <ConversationSidebar
+      <Sidebar
         conversations={conversations}
         selectConversation={selectConversation}
-        setMessagesVisible={setMessagesVisible}
         currentConversation={currentConversation || { messages: [] }}
         socket={socket}
       />
-      <ConversationMessages
+      <MainSection
         currentConversation={currentConversation || { messages: [] }}
         sendMessage={sendMessage}
-        conversationSelected={!!currentConversation}
-        messagesVisible={messagesVisible}
       />
     </Grid>
   );

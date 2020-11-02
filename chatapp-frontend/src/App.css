@@ -27,6 +27,6 @@ body {
 }
 
 .messageList {
-  overflow-y: scroll;
+  overflow-y: auto;
   flex-wrap: nowrap;
 }

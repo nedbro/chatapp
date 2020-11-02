@@ -1,18 +1,13 @@
 import { Button, Grid, TextField } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
-import Typography from "@material-ui/core/Typography";
 import Axios from "axios";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../utils/AuthProvider";
 import { SERVER_URL } from "../../utils/Constants";
 import "./conversation.css";
 
-const ConversationMessages = ({
-  currentConversation,
-  sendMessage,
-  messagesVisible,
-}) => {
-  const { signedInUser, setSignedInUser } = useContext(AuthContext);
+const MainSection = ({ currentConversation, sendMessage }) => {
+  const { signedInUser } = useContext(AuthContext);
   const [messageToSend, setMessageToSend] = useState("");
   const messageList = currentConversation.messages.map((message) => {
     return (
@@ -42,70 +37,69 @@ const ConversationMessages = ({
     setMessageToSend("");
   };
 
-  const logout = () => {
-    Axios.delete(SERVER_URL + "/auth/logout", {
-      withCredentials: true,
-    }).finally(() => setSignedInUser(null));
+  const keyPress = (e) => {
+    if (e.keyCode == 13) {
+      handleSendClick();
+    }
   };
 
   return (
-    <Grid
-      item
-      container
-      xs={10}
-      justify="center"
-      alignItems="center"
-      className="fullHeight"
-    >
+    <Grid item container xs={9} className="fullHeight">
       <Grid
         item
         container
-        xs={6}
+        xs={9}
         className="fullHeight messageListWrapper"
         direction="column"
+        justify="space-evenly"
       >
-        {messageList && messagesVisible ? (
+        {currentConversation && messageList ? (
           <>
             <Grid
               item
-              xs={10}
+              xs={9}
               container
               direction="column-reverse"
               alignItems="stretch"
-              spacing={2}
               className="fullWidth messageList"
+              spacing={2}
             >
               {messageList.reverse()}
             </Grid>
-            <Grid item>
-              <TextField
-                value={messageToSend}
-                onChange={updateMessageToSend}
-                mr={2}
-              />
-              <Button variant="contained" onClick={handleSendClick}>
-                Send
-              </Button>
-              <Button onClick={logout}>Logout</Button>
+            <Grid
+              item
+              container
+              xs={2}
+              justify="space-evenly"
+              alignContent="center"
+              className="fullWidth sendContainer"
+            >
+              <Grid item xs={9}>
+                <TextField
+                  value={messageToSend}
+                  onChange={updateMessageToSend}
+                  mr={2}
+                  fullWidth
+                  onKeyDown={(event) => keyPress(event)}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={2}
+                container
+                alignContent="center"
+                justify="center"
+              >
+                <Button variant="contained" onClick={handleSendClick}>
+                  Send
+                </Button>
+              </Grid>
             </Grid>
           </>
-        ) : (
-          <Grid
-            item
-            container
-            xs={6}
-            className="fullHeight fullWidth"
-            alignItems="flex-end"
-            justify="center"
-          >
-            <Typography variant="h3" gutterBottom align="center">
-              Start a new conversation or select and existing one
-            </Typography>
-          </Grid>
-        )}
+        ) : null}
       </Grid>
     </Grid>
   );
 };
 
-export default ConversationMessages;
+export default MainSection;
