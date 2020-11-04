@@ -7,6 +7,7 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
 import "../conversation.css";
+import "./sidebar.css";
 import ConversationList from "./ConversationList";
 import ConversationStart from "./ConversationStart";
 
@@ -42,7 +43,6 @@ const Sidebar = ({
   };
 
   const handleConversationsTabClick = () => {
-    selectConversation(conversations[0]);
     setConversationsVisible(true);
   };
 
@@ -58,9 +58,13 @@ const Sidebar = ({
 
   return (
     <Grid item container direction="column" xs={3}>
-      <Paper square>
-        <Typography>{signedInUser.username}</Typography>
-        <Button onClick={logout}>Logout</Button>
+      <Paper square className="sidebarTabContainer">
+        <div className="topContainer">
+          <Typography variant="h5" className="username">
+            {signedInUser.username}
+          </Typography>
+          <Button variant="contained" color="secondary" onClick={logout}>Logout</Button>
+        </div>
         <Tabs
           value={conversationsVisible}
           indicatorColor="primary"

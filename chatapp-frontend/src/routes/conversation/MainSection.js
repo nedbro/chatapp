@@ -1,32 +1,35 @@
-import { Button, Grid, TextField } from "@material-ui/core";
+import { Box, Button, Grid, TextField, Typography } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
-import Axios from "axios";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../utils/AuthProvider";
-import { SERVER_URL } from "../../utils/Constants";
 import "./conversation.css";
 
 const MainSection = ({ currentConversation, sendMessage }) => {
   const { signedInUser } = useContext(AuthContext);
   const [messageToSend, setMessageToSend] = useState("");
-  const messageList = currentConversation.messages.map((message) => {
-    return (
-      <Grid item container className="fullWidth" key={message["_id"]}>
-        <Grid
-          item
-          xs={12}
-          container
-          justify={
-            (signedInUser ? signedInUser["_id"] : null) === message.sender
-              ? "flex-end"
-              : "flex-start"
-          }
-        >
-          <Chip label={message.text} className="message" />
+
+  let messageList = [];
+
+  if (currentConversation && currentConversation.messages) {
+    messageList = currentConversation.messages.map((message) => {
+      return (
+        <Grid item container className="fullWidth" key={message["_id"]}>
+          <Grid
+            item
+            xs={12}
+            container
+            justify={
+              (signedInUser ? signedInUser["_id"] : null) === message.sender
+                ? "flex-end"
+                : "flex-start"
+            }
+          >
+            <Chip label={message.text} className="message" />
+          </Grid>
         </Grid>
-      </Grid>
-    );
-  });
+      );
+    });
+  }
 
   const updateMessageToSend = (event) => {
     setMessageToSend(event.target.value);
@@ -37,8 +40,8 @@ const MainSection = ({ currentConversation, sendMessage }) => {
     setMessageToSend("");
   };
 
-  const keyPress = (e) => {
-    if (e.keyCode == 13) {
+  const sendOnEnter = (e) => {
+    if (e.keyCode === 13) {
       handleSendClick();
     }
   };
@@ -53,7 +56,7 @@ const MainSection = ({ currentConversation, sendMessage }) => {
         direction="column"
         justify="space-evenly"
       >
-        {currentConversation && messageList ? (
+        {currentConversation && currentConversation.messages && messageList ? (
           <>
             <Grid
               item
@@ -80,7 +83,7 @@ const MainSection = ({ currentConversation, sendMessage }) => {
                   onChange={updateMessageToSend}
                   mr={2}
                   fullWidth
-                  onKeyDown={(event) => keyPress(event)}
+                  onKeyDown={(event) => sendOnEnter(event)}
                 />
               </Grid>
               <Grid
@@ -90,13 +93,31 @@ const MainSection = ({ currentConversation, sendMessage }) => {
                 alignContent="center"
                 justify="center"
               >
-                <Button variant="contained" onClick={handleSendClick}>
+                <Button
+                  variant="contained"
+                  onClick={handleSendClick}
+                  color="primary"
+                >
                   Send
                 </Button>
               </Grid>
             </Grid>
           </>
         ) : null}
+      </Grid>
+      <Grid item xs={3}>
+        <Box mt={10} pl={5}>
+          <Typography variant="h5">
+            {currentConversation && currentConversation.messages
+              ? "Current conversation:"
+              : null}
+          </Typography>
+          <Typography variant="h3">
+            {currentConversation && currentConversation.messages
+              ? currentConversation.name
+              : null}
+          </Typography>
+        </Box>
       </Grid>
     </Grid>
   );

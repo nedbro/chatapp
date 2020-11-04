@@ -1,9 +1,9 @@
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Box, Paper, Typography } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
-import "../conversation.css";
+import "./sidebar.css";
 
 const ConversationStart = ({ startConversation }) => {
   const [newConversationCards, setNewConversationCards] = useState("");
@@ -27,22 +27,22 @@ const ConversationStart = ({ startConversation }) => {
 
     users.forEach((user) => {
       userList.push(
-        <Grid
-          item
-          container
-          direction="row"
-          xs={1}
-          className="fullWidth"
+        <Box
+          display="flex"
+          className="conversationBoxContainer"
           key={user["_id"]}
           justify="center"
           alignItems="center"
         >
-          <Paper className="userPaper" onClick={() => startConversation(user)}>
+          <Paper
+            className="sidebarPaper"
+            onClick={() => startConversation(user)}
+          >
             <Typography variant="h6" gutterBottom>
               {user.username}
             </Typography>
           </Paper>
-        </Grid>
+        </Box>
       );
     });
 

@@ -1,28 +1,25 @@
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Box, Paper, Typography } from "@material-ui/core";
 import React from "react";
+import "./sidebar.css";
 
 const ConversationList = ({
   conversations,
   selectConversation,
   currentConversation,
 }) => {
-  console.log("conversations", conversations);
   const conversationList = conversations.map((conversation) => {
     const selected = currentConversation["_id"] === conversation["_id"];
 
     return (
-      <Grid
-        item
-        container
-        direction="row"
-        xs={2}
-        className="fullWidth"
+      <Box
+        display="flex"
+        className="conversationBoxContainer"
         key={conversation._id}
         justify="center"
         alignItems="center"
       >
         <Paper
-          className={`conversationPaper ${
+          className={`sidebarPaper ${
             selected ? "selectedConversationPaper" : ""
           }`}
           onClick={() => selectConversation(conversation)}
@@ -36,7 +33,7 @@ const ConversationList = ({
               : ""}
           </Typography>
         </Paper>
-      </Grid>
+      </Box>
     );
   });
 

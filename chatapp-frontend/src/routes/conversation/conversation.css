@@ -1,20 +1,10 @@
-.conversationPaper {
-  width: 90% !important;
-  height: 80% !important;
-  text-align: center;
-}
-
-.selectedConversationPaper {
-  background-color: #80d6ff;
-}
-
 .message {
   background-color: #80d6ff;
 }
 
 .userPaper {
   width: 90% !important;
-  height: 70% !important;
+  height: 80% !important;
   text-align: center;
 }
 

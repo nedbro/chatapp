@@ -1,0 +1,30 @@
+.conversationBoxContainer {
+  width: 90%;
+  height: 10rem;
+  margin: 0.4rem auto;
+}
+
+.sidebarTabContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.topContainer {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 1rem 0;
+}
+
+.username {
+  text-align: center;
+}
+
+.sidebarPaper {
+  width: 90% !important;
+  height: 80% !important;
+  text-align: center;
+}
+
+.selectedConversationPaper {
+    background-color: #80d6ff;
+  }

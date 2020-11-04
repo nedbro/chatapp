@@ -8,7 +8,7 @@ import Sidebar from "./sidebar/Sidebar";
 
 const ConversationPage = () => {
   const { signedInUser } = useContext(AuthContext);
-  const [currentConversation, setCurrentConversation] = useState(null);
+  const [currentConversation, setCurrentConversation] = useState({});
   const [conversations, setConversations] = useState([]);
   const [socket, setSocket] = useState(null);
 
@@ -23,10 +23,6 @@ const ConversationPage = () => {
     if (socket) {
       socket.emit("subscribeToConversations", signedInUser["_id"]);
 
-      const interval = setInterval(() => {
-        socket.emit("subscribeToConversations", signedInUser["_id"]);
-      }, 10000);
-
       socket.on("subscribedToConversations", () => {
         socket.emit("askForLatestConversations", signedInUser["_id"]);
       });
@@ -40,7 +36,6 @@ const ConversationPage = () => {
       });
 
       return () => {
-        clearInterval(interval);
         socket.disconnect();
       };
     }
@@ -72,11 +67,7 @@ const ConversationPage = () => {
   };
 
   const selectConversation = (conversation) => {
-    conversations.forEach((element) => {
-      if (conversation["_id"] === element["_id"]) {
-        setCurrentConversation(element);
-      }
-    });
+    setCurrentConversation(conversation);
   };
 
   return (
@@ -84,11 +75,11 @@ const ConversationPage = () => {
       <Sidebar
         conversations={conversations}
         selectConversation={selectConversation}
-        currentConversation={currentConversation || { messages: [] }}
+        currentConversation={currentConversation}
         socket={socket}
       />
       <MainSection
-        currentConversation={currentConversation || { messages: [] }}
+        currentConversation={currentConversation}
         sendMessage={sendMessage}
       />
     </Grid>
