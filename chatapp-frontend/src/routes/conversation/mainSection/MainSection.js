@@ -1,17 +1,22 @@
 import { Box, Button, Grid, TextField, Typography } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
-import React, { useContext, useState } from "react";
-import { AuthContext } from "../../utils/AuthProvider";
-import "./conversation.css";
+import Axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import { AuthContext } from "../../../utils/AuthProvider";
+import { SERVER_URL } from "../../../utils/Constants";
+import "../conversation.css";
 
-const MainSection = ({ currentConversation, sendMessage }) => {
-  const { signedInUser } = useContext(AuthContext);
+const MainSection = ({ socket }) => {
+  const { signedInUser, setSignedInUser } = useContext(AuthContext);
   const [messageToSend, setMessageToSend] = useState("");
+  const { conversationId } = useParams();
+  const history = useHistory();
+  const [currentConversation, setCurrentConversation] = useState();
+  const [messageList, setMessageList] = useState([]);
 
-  let messageList = [];
-
-  if (currentConversation && currentConversation.messages) {
-    messageList = currentConversation.messages.map((message) => {
+  useEffect(() => {
+    const createMessage = (message) => {
       return (
         <Grid item container className="fullWidth" key={message["_id"]}>
           <Grid
@@ -28,16 +33,57 @@ const MainSection = ({ currentConversation, sendMessage }) => {
           </Grid>
         </Grid>
       );
-    });
-  }
+    };
+
+    if (conversationId) {
+      Axios.get(`${SERVER_URL}/conversations/${conversationId}`, {
+        withCredentials: true,
+      })
+        .then((response) => {
+          const conversation = response.data;
+          if (conversation["_id"] === conversationId && conversation.messages) {
+            const newMessageList = conversation.messages.map((message) =>
+              createMessage(message)
+            );
+            setCurrentConversation(conversation);
+            setMessageList(newMessageList);
+          }
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 401) {
+            setSignedInUser(null);
+          } else {
+            history.push("/conversation");
+          }
+        });
+
+      if (socket) {
+        socket.on(`newMessageIn${conversationId}`, (message) => {
+          setMessageList((current) => {
+            const newMessageList = [...current];
+            newMessageList.push(createMessage(message));
+            return newMessageList;
+          });
+        });
+      }
+    }
+  }, [conversationId, socket, history]);
 
   const updateMessageToSend = (event) => {
     setMessageToSend(event.target.value);
   };
 
   const handleSendClick = () => {
-    sendMessage(messageToSend);
-    setMessageToSend("");
+    if (socket) {
+      const dataToSend = {
+        sender: signedInUser["_id"],
+        messageText: messageToSend,
+      };
+      socket.emit("sendMessage", conversationId, dataToSend);
+      setMessageToSend("");
+    } else {
+      console.log("socket", socket);
+    }
   };
 
   const sendOnEnter = (e) => {
@@ -56,7 +102,7 @@ const MainSection = ({ currentConversation, sendMessage }) => {
         direction="column"
         justify="space-evenly"
       >
-        {currentConversation && currentConversation.messages && messageList ? (
+        {conversationId && messageList ? (
           <>
             <Grid
               item
@@ -67,7 +113,7 @@ const MainSection = ({ currentConversation, sendMessage }) => {
               className="fullWidth messageList"
               spacing={2}
             >
-              {messageList.reverse()}
+              {messageList.length > 0 ? messageList : null}
             </Grid>
             <Grid
               item

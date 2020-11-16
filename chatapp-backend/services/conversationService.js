@@ -49,6 +49,7 @@ exports.sendMessage = async (conversation, messageInput) => {
   conversation.messages.push(message);
   conversation.last_active = message.sent_at;
   await conversation.save();
+  return message.toObject({ depopulate: true });
 };
 
 exports.getConversationsOfUser = async (user) => {

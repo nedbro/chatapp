@@ -19,7 +19,6 @@ router.delete("/logout", checkAuthenticated, (req, res, next) => {
 });
 
 router.get("/me", (req, res, next) => {
-  console.log(JSON.stringify(req.user));
   if (req.isAuthenticated()) {
     res.json({ username: req.user.username, _id: req.user["_id"] });
   } else {

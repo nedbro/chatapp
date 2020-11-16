@@ -61,7 +61,6 @@ socketAPI.io.use(wrap(passport.session()));
 
 socketAPI.io.use((socket, next) => {
   if (socket.request.user) {
-    console.log("MEGVAN A USER");
     next();
   } else {
     next(new Error("unauthorized"));

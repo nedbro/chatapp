@@ -27,12 +27,13 @@ io.on("connect", (socket, next) => {
 
     if (validationResult) {
       try {
-        await conversationService.sendMessage(
+        const message = await conversationService.sendMessage(
           validationResult.conversation,
           validationResult.messageInput
         );
 
         io.to(conversationId).emit("thereIsANewMessage");
+        io.to(conversationId).emit(`newMessageIn${conversationId}`, message);
       } catch (error) {
         console.log(error);
       }

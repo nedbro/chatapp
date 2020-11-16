@@ -1,24 +1,43 @@
 import { Button, Grid, Paper, Typography } from "@material-ui/core";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
-import Axios from "axios";
-import axios from "axios";
-import React, { useContext, useState } from "react";
+import { default as Axios, default as axios } from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
 import "../conversation.css";
-import "./sidebar.css";
 import ConversationList from "./ConversationList";
 import ConversationStart from "./ConversationStart";
+import "./sidebar.css";
 
-const Sidebar = ({
-  conversations,
-  selectConversation,
-  currentConversation,
-  socket,
-}) => {
+const Sidebar = ({ socket }) => {
+  const [conversations, setConversations] = useState([]);
   const [conversationsVisible, setConversationsVisible] = useState(true);
   const { signedInUser, setSignedInUser } = useContext(AuthContext);
+  const history = useHistory();
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("subscribeToConversations", signedInUser["_id"]);
+
+      socket.on("subscribedToConversations", () => {
+        socket.emit("askForLatestConversations", signedInUser["_id"]);
+      });
+
+      socket.on("sentCurrentUsersConversations", (data) => {
+        setConversations(data);
+      });
+
+      socket.on("thereIsANewMessage", () => {
+        socket.emit("askForLatestConversations", signedInUser["_id"]);
+      });
+
+      return () => {
+        socket.disconnect();
+      };
+    }
+  }, [socket, signedInUser, setConversations]);
 
   const startConversation = (user) => {
     const conversationData = {
@@ -32,7 +51,7 @@ const Sidebar = ({
       })
       .then((response) => {
         socket.emit("subscribeToConversations", signedInUser["_id"]);
-        selectConversation(response.data);
+        selectConversation(response.data["_id"]);
         setConversationsVisible(true);
       })
       .catch((error) => {
@@ -50,6 +69,10 @@ const Sidebar = ({
     setConversationsVisible(false);
   };
 
+  const selectConversation = (conversation) => {
+    history.push(`/conversation/${conversation["_id"]}`);
+  };
+
   const logout = () => {
     Axios.delete(SERVER_URL + "/auth/logout", {
       withCredentials: true,
@@ -63,7 +86,9 @@ const Sidebar = ({
           <Typography variant="h5" className="username">
             {signedInUser.username}
           </Typography>
-          <Button variant="contained" color="secondary" onClick={logout}>Logout</Button>
+          <Button variant="contained" color="secondary" onClick={logout}>
+            Logout
+          </Button>
         </div>
         <Tabs
           value={conversationsVisible}
@@ -87,7 +112,6 @@ const Sidebar = ({
         <ConversationList
           conversations={conversations}
           selectConversation={selectConversation}
-          currentConversation={currentConversation}
         />
       ) : (
         <ConversationStart startConversation={startConversation} />
