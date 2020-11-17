@@ -11,7 +11,7 @@ import ConversationList from "./ConversationList";
 import ConversationStart from "./ConversationStart";
 import "./sidebar.css";
 
-const Sidebar = ({ socket }) => {
+const Sidebar = ({ socket, setSocket }) => {
   const [conversations, setConversations] = useState([]);
   const [conversationsVisible, setConversationsVisible] = useState(true);
   const { signedInUser, setSignedInUser } = useContext(AuthContext);
@@ -32,10 +32,6 @@ const Sidebar = ({ socket }) => {
       socket.on("thereIsANewMessage", () => {
         socket.emit("askForLatestConversations", signedInUser["_id"]);
       });
-
-      return () => {
-        socket.disconnect();
-      };
     }
   }, [socket, signedInUser, setConversations]);
 

@@ -42,6 +42,7 @@ const MainSection = ({ socket }) => {
         .then((response) => {
           const conversation = response.data;
           if (conversation["_id"] === conversationId && conversation.messages) {
+            conversation.messages.reverse();
             const newMessageList = conversation.messages.map((message) =>
               createMessage(message)
             );
@@ -61,7 +62,7 @@ const MainSection = ({ socket }) => {
         socket.on(`newMessageIn${conversationId}`, (message) => {
           setMessageList((current) => {
             const newMessageList = [...current];
-            newMessageList.push(createMessage(message));
+            newMessageList.unshift(createMessage(message));
             return newMessageList;
           });
         });

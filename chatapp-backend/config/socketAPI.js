@@ -4,6 +4,7 @@ const { getUserById } = require("../services/userService");
 const conversationService = require("../services/conversationService");
 
 io.on("connect", (socket, next) => {
+  
   socket.on("subscribeToConversations", async (userId) => {
     const user = await getUserById(userId);
     try {

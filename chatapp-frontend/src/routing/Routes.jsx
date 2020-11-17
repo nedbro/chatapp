@@ -5,21 +5,29 @@ import UserRegistration from "../routes/auth/UserRegistration";
 import { EmptyConversation } from "../routes/conversation/mainSection/EmptyConversation";
 import Sidebar from "../routes/conversation/sidebar/Sidebar";
 import { AuthContext } from "../utils/AuthProvider";
-import { SERVER_URL } from "../utils/Constants";
 import socketIOClient from "socket.io-client";
+
 import MainSection from "../routes/conversation/mainSection/MainSection";
+import { SERVER_URL } from "../utils/Constants";
 
 export const Routes = () => {
   const { signedInUser } = useContext(AuthContext);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    setSocket(socketIOClient(SERVER_URL + "/"));
-  }, []);
+    if (signedInUser && !socket) {
+      const helper = socketIOClient(SERVER_URL + "/");
+      setSocket(helper);
+      return () => {
+        helper.disconnect();
+        setSocket(null);
+      };
+    }
+  }, [signedInUser]);
 
   return signedInUser ? (
     <>
-      <Sidebar socket={socket} />
+      <Sidebar socket={socket} setSocket={setSocket} />
       <Switch>
         <Route path="/conversation" exact>
           <EmptyConversation />
