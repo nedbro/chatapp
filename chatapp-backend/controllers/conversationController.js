@@ -34,7 +34,7 @@ router.post("/", [
 ]);
 
 router.get("/:id", checkAuthenticated, (req, res, next) => {
-  conversationService.getConversation(req.params.id).then(
+  conversationService.getConversationWithoutMessages(req.params.id).then(
     (data) => res.json(data),
     (error) => next(error)
   );

@@ -26,6 +26,7 @@ const Sidebar = ({ socket, setSocket }) => {
       });
 
       socket.on("sentCurrentUsersConversations", (data) => {
+        console.log("data", data);
         setConversations(data);
       });
 

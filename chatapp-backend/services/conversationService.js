@@ -61,6 +61,30 @@ exports.getConversationsOfUser = async (user) => {
     .limit(5);
 };
 
+exports.getConversationsOfUserForCards = async (user) => {
+  const conversations = await Conversation.find()
+    .where("participants")
+    .in([user])
+    .populate("messages participants")
+    .sort({ last_active: -1 })
+    .limit(5);
+
+  conversations.forEach((conversation) => {
+    if (conversation.messages.length > 0) {
+      conversation.messages = conversation.messages.slice(
+        conversation.messages.length - 1,
+        conversation.messages.length
+      );
+    }
+  });
+
+  return conversations;
+};
+
+exports.getConversationWithoutMessages = async (conversationId) => {
+  return Conversation.findById(conversationId).populate(["participants"]);
+};
+
 exports.getConversationsOfUserForSubscribing = async (user) => {
   return await Conversation.find().where("participants").in([user]);
 };

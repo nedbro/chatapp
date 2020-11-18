@@ -4,7 +4,6 @@ const { getUserById } = require("../services/userService");
 const conversationService = require("../services/conversationService");
 
 io.on("connect", (socket, next) => {
-  
   socket.on("subscribeToConversations", async (userId) => {
     const user = await getUserById(userId);
     try {
@@ -43,9 +42,10 @@ io.on("connect", (socket, next) => {
 
   socket.on("askForLatestConversations", async (userId) => {
     const user = await getUserById(userId);
-    const conversations = await conversationService.getConversationsOfUser(
+    const conversations = await conversationService.getConversationsOfUserForCards(
       user
     );
+
     socket.emit("sentCurrentUsersConversations", conversations);
   });
 

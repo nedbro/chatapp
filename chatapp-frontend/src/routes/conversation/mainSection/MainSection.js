@@ -1,10 +1,11 @@
+import React, { useContext, useEffect, useState } from "react";
 import { Box, Button, Grid, TextField, Typography } from "@material-ui/core";
 import Chip from "@material-ui/core/Chip";
 import Axios from "axios";
-import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
+import InfiniteScroll from "react-infinite-scroll-component";
 import "../conversation.css";
 
 const MainSection = ({ socket }) => {
@@ -42,14 +43,18 @@ const MainSection = ({ socket }) => {
         .then((response) => {
           const conversation = response.data;
           if (conversation["_id"] === conversationId && conversation.messages) {
-            conversation.messages.reverse();
-            const newMessageList = conversation.messages.map((message) =>
-              createMessage(message)
-            );
             setCurrentConversation(conversation);
-            setMessageList(newMessageList);
           }
         })
+        //   if (conversation["_id"] === conversationId && conversation.messages) {
+        //     conversation.messages.reverse();
+        //     const newMessageList = conversation.messages.map((message) =>
+        //       createMessage(message)
+        //     );
+        //     setCurrentConversation(conversation);
+        //     setMessageList(newMessageList);
+        //   }
+        // })
         .catch((error) => {
           if (error.response && error.response.status === 401) {
             setSignedInUser(null);
@@ -93,6 +98,10 @@ const MainSection = ({ socket }) => {
     }
   };
 
+  const getNextMessages = (data) => {
+
+  }
+
   return (
     <Grid item container xs={9} className="fullHeight">
       <Grid
@@ -114,7 +123,20 @@ const MainSection = ({ socket }) => {
               className="fullWidth messageList"
               spacing={2}
             >
-              {messageList.length > 0 ? messageList : null}
+              <InfiniteScroll
+                inverse
+                dataLength={1000} //This is important field to render the next data
+                next={(data) => console.log("asking for more data", data)}
+                hasMore={true}
+                loader={<h4>Loading...</h4>}
+                endMessage={
+                  <p style={{ textAlign: "center" }}>
+                    <b>Yay! You have seen it all</b>
+                  </p>
+                }
+              >
+                {messageList.length > 0 ? messageList : null}
+              </InfiniteScroll>
             </Grid>
             <Grid
               item
