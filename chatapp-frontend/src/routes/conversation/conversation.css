@@ -1,5 +1,6 @@
 .message {
   background-color: #80d6ff;
+  margin: 0.4rem 0;
 }
 
 .userPaper {
@@ -9,7 +10,11 @@
 }
 
 .messageList {
+  display: flex;
+  flex-direction: column-reverse;
   padding: 0 2rem;
+  height: 80vh;
+  overflow-y: auto;
 }
 
 .sendContainer {

@@ -43,6 +43,7 @@ exports.sendMessage = async (conversation, messageInput) => {
   const message = new Message({
     text: messageInput.messageText,
     sender: messageInput.sender,
+    conversation: conversation,
   });
 
   await message.save();

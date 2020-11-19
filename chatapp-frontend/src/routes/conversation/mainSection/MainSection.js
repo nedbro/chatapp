@@ -1,106 +1,70 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Box, Button, Grid, TextField, Typography } from "@material-ui/core";
-import Chip from "@material-ui/core/Chip";
+import { Grid } from "@material-ui/core";
 import Axios from "axios";
-import { useHistory, useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { AuthContext } from "../../../utils/AuthProvider";
 import { SERVER_URL } from "../../../utils/Constants";
-import InfiniteScroll from "react-infinite-scroll-component";
 import "../conversation.css";
+import { ConversationSidebar } from "./ConversationSidebar";
+import { MessageSection } from "./MessageSection";
+import { useMessageSearch } from "./useMessageSearch";
 
 const MainSection = ({ socket }) => {
-  const { signedInUser, setSignedInUser } = useContext(AuthContext);
-  const [messageToSend, setMessageToSend] = useState("");
+  const { setSignedInUser } = useContext(AuthContext);
   const { conversationId } = useParams();
-  const history = useHistory();
-  const [currentConversation, setCurrentConversation] = useState();
-  const [messageList, setMessageList] = useState([]);
+  const [currentConversation, setCurrentConversation] = useState(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const {
+    messages,
+    addMessageToTheStart,
+    isLoading,
+    hasMore,
+  } = useMessageSearch(currentPage);
 
   useEffect(() => {
-    const createMessage = (message) => {
-      return (
-        <Grid item container className="fullWidth" key={message["_id"]}>
-          <Grid
-            item
-            xs={12}
-            container
-            justify={
-              (signedInUser ? signedInUser["_id"] : null) === message.sender
-                ? "flex-end"
-                : "flex-start"
-            }
-          >
-            <Chip label={message.text} className="message" />
-          </Grid>
-        </Grid>
-      );
-    };
-
     if (conversationId) {
+      socket.on(`newMessageIn${conversationId}`, (message) => {
+        addMessageToTheStart(message);
+      });
+      setCurrentPage(1);
+    }
+  }, [conversationId]);
+
+  useEffect(() => {
+    if (conversationId && !currentConversation) {
+      let cancel;
       Axios.get(`${SERVER_URL}/conversations/${conversationId}`, {
         withCredentials: true,
+        cancelToken: new Axios.CancelToken((c) => (cancel = c)),
       })
         .then((response) => {
           const conversation = response.data;
-          if (conversation["_id"] === conversationId && conversation.messages) {
+          if (conversation["_id"] === conversationId) {
             setCurrentConversation(conversation);
           }
         })
-        //   if (conversation["_id"] === conversationId && conversation.messages) {
-        //     conversation.messages.reverse();
-        //     const newMessageList = conversation.messages.map((message) =>
-        //       createMessage(message)
-        //     );
-        //     setCurrentConversation(conversation);
-        //     setMessageList(newMessageList);
-        //   }
-        // })
         .catch((error) => {
+          if (Axios.isCancel(error)) {
+            return;
+          }
           if (error.response && error.response.status === 401) {
             setSignedInUser(null);
-          } else {
-            history.push("/conversation");
           }
         });
 
-      if (socket) {
-        socket.on(`newMessageIn${conversationId}`, (message) => {
-          setMessageList((current) => {
-            const newMessageList = [...current];
-            newMessageList.unshift(createMessage(message));
-            return newMessageList;
-          });
-        });
-      }
+      return () => cancel();
     }
-  }, [conversationId, socket, history]);
+  }, [conversationId, currentConversation, setSignedInUser]);
 
-  const updateMessageToSend = (event) => {
-    setMessageToSend(event.target.value);
-  };
-
-  const handleSendClick = () => {
+  const emitToSocketOnMessageSend = (dataToSend) => {
     if (socket) {
-      const dataToSend = {
-        sender: signedInUser["_id"],
-        messageText: messageToSend,
-      };
       socket.emit("sendMessage", conversationId, dataToSend);
-      setMessageToSend("");
     } else {
       console.log("socket", socket);
     }
   };
-
-  const sendOnEnter = (e) => {
-    if (e.keyCode === 13) {
-      handleSendClick();
-    }
-  };
-
-  const getNextMessages = (data) => {
-
-  }
 
   return (
     <Grid item container xs={9} className="fullHeight">
@@ -112,82 +76,19 @@ const MainSection = ({ socket }) => {
         direction="column"
         justify="space-evenly"
       >
-        {conversationId && messageList ? (
+        {conversationId ? (
           <>
-            <Grid
-              item
-              xs={9}
-              container
-              direction="column-reverse"
-              alignItems="stretch"
-              className="fullWidth messageList"
-              spacing={2}
-            >
-              <InfiniteScroll
-                inverse
-                dataLength={1000} //This is important field to render the next data
-                next={(data) => console.log("asking for more data", data)}
-                hasMore={true}
-                loader={<h4>Loading...</h4>}
-                endMessage={
-                  <p style={{ textAlign: "center" }}>
-                    <b>Yay! You have seen it all</b>
-                  </p>
-                }
-              >
-                {messageList.length > 0 ? messageList : null}
-              </InfiniteScroll>
-            </Grid>
-            <Grid
-              item
-              container
-              xs={2}
-              justify="space-evenly"
-              alignContent="center"
-              className="fullWidth sendContainer"
-            >
-              <Grid item xs={9}>
-                <TextField
-                  value={messageToSend}
-                  onChange={updateMessageToSend}
-                  mr={2}
-                  fullWidth
-                  onKeyDown={(event) => sendOnEnter(event)}
-                />
-              </Grid>
-              <Grid
-                item
-                xs={2}
-                container
-                alignContent="center"
-                justify="center"
-              >
-                <Button
-                  variant="contained"
-                  onClick={handleSendClick}
-                  color="primary"
-                >
-                  Send
-                </Button>
-              </Grid>
-            </Grid>
+            <MessageSection
+              messages={messages}
+              emitToSocketOnMessageSend={emitToSocketOnMessageSend}
+              isLoading={isLoading}
+              hasMore={hasMore}
+              setCurrentPage={setCurrentPage}
+            ></MessageSection>
           </>
         ) : null}
       </Grid>
-      <Grid item xs={3}>
-        <Box mt={10} pl={5}>
-          <Typography variant="h5">
-            {currentConversation && currentConversation.messages
-              ? "Current conversation:"
-              : null}
-          </Typography>
-          <Typography variant="h3">
-            {currentConversation && currentConversation.messages
-              ? currentConversation.name
-              : null}
-          </Typography>
-        </Box>
-      </Grid>
+      <ConversationSidebar currentConversation={currentConversation} />
     </Grid>
   );
 };

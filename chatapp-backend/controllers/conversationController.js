@@ -47,7 +47,7 @@ router.delete("/:id", checkAuthenticated, (req, res, next) => {
   );
 });
 
-router.post("/:id", [
+router.post("/:id/message", [
   checkAuthenticated,
   body("sender").isString().withMessage("The provided user input is incorrect"),
   body("messageText").isString().trim().isLength({ min: 1 }),

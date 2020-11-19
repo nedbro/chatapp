@@ -20,6 +20,7 @@ io.on("connect", (socket, next) => {
   });
 
   socket.on("sendMessage", async (conversationId, messageInput) => {
+    console.log("send message", conversationId, messageInput);
     const validationResult = await conversationService.validateSendMessageInput(
       conversationId,
       messageInput
