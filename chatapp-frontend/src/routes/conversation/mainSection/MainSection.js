@@ -7,7 +7,7 @@ import { SERVER_URL } from "../../../utils/Constants";
 import "../conversation.css";
 import { ConversationSidebar } from "./ConversationSidebar";
 import { MessageSection } from "./MessageSection";
-import { useMessageSearch } from "./useMessageSearch";
+import { useMessagePagination } from "./useMessagePagination";
 
 const MainSection = ({ socket }) => {
   const { setSignedInUser } = useContext(AuthContext);
@@ -21,7 +21,7 @@ const MainSection = ({ socket }) => {
     addMessageToTheStart,
     isLoading,
     hasMore,
-  } = useMessageSearch(currentPage);
+  } = useMessagePagination(currentPage);
 
   useEffect(() => {
     if (conversationId) {

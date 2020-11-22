@@ -24,7 +24,7 @@ exports.getUserById = async (id) => {
   return await User.findById(id);
 };
 
-exports.getNewUsersForConversations = async (userId) => {
+exports.getNewUsersForConversations = async (userId, page) => {
   const currentUser = await this.getUserById(userId);
 
   if (currentUser === null || currentUser === undefined) {

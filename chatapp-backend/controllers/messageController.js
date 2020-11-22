@@ -12,7 +12,7 @@ router.get("/", checkAuthenticated, (req, res, next) => {
   );
 });
 
-router.get("/:conversationId", checkAuthenticated, async (req, res, next) => {
+router.get("/ofConversation/:conversationId", checkAuthenticated, async (req, res, next) => {
   const { page = 1, limit = 20 } = req.query;
   try {
     // execute query with page and limit values

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { SERVER_URL } from "../../../utils/Constants";
 import "../conversation.css";
 
-export const useMessageSearch = (pageNumber) => {
+export const useMessagePagination = (pageNumber) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -18,7 +18,7 @@ export const useMessageSearch = (pageNumber) => {
   useEffect(() => {
     let cancel;
     setIsLoading(true);
-    Axios.get(`${SERVER_URL}/messages/${conversationId}`, {
+    Axios.get(`${SERVER_URL}/messages/ofConversation/${conversationId}`, {
       params: { page: pageNumber },
       withCredentials: true,
       cancelToken: new Axios.CancelToken((c) => (cancel = c)),

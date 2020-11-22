@@ -12,28 +12,22 @@ import ConversationStart from "./ConversationStart";
 import "./sidebar.css";
 
 const Sidebar = ({ socket, setSocket }) => {
-  const [conversations, setConversations] = useState([]);
+  const [askForMultiplePages, setAskForMultiplePages] = useState(false);
   const [conversationsVisible, setConversationsVisible] = useState(true);
   const { signedInUser, setSignedInUser } = useContext(AuthContext);
   const history = useHistory();
+
 
   useEffect(() => {
     if (socket) {
       socket.emit("subscribeToConversations", signedInUser["_id"]);
 
-      socket.on("subscribedToConversations", () => {
-        socket.emit("askForLatestConversations", signedInUser["_id"]);
-      });
-
-      socket.on("sentCurrentUsersConversations", (data) => {
-        setConversations(data);
-      });
-
       socket.on("thereIsANewMessage", () => {
-        socket.emit("askForLatestConversations", signedInUser["_id"]);
+        setAskForMultiplePages(true);
+        console.log('there is a new message');
       });
     }
-  }, [socket, signedInUser, setConversations]);
+  }, [socket, signedInUser]);
 
   const startConversation = (user) => {
     const conversationData = {
@@ -106,8 +100,9 @@ const Sidebar = ({ socket, setSocket }) => {
       </Paper>
       {conversationsVisible ? (
         <ConversationList
-          conversations={conversations}
           selectConversation={selectConversation}
+          isThereANewMessage={askForMultiplePages}
+          setIsThereANewMessage={setAskForMultiplePages}
         />
       ) : (
         <ConversationStart startConversation={startConversation} />

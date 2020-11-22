@@ -58,8 +58,9 @@ router.get("/:id/conversations", [
 router.get("/:id/newConversations", [
   checkAuthenticated,
   (req, res, next) => {
+    const { page = 1, limit = 20 } = req.query;
     userService
-      .getNewUsersForConversations(req.params.id)
+      .getNewUsersForConversations(req.params.id,page, limit)
       .then((users) => res.json(users))
       .catch((error) => next(error));
   },

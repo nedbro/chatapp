@@ -20,7 +20,6 @@ io.on("connect", (socket, next) => {
   });
 
   socket.on("sendMessage", async (conversationId, messageInput) => {
-    console.log("send message", conversationId, messageInput);
     const validationResult = await conversationService.validateSendMessageInput(
       conversationId,
       messageInput
@@ -39,15 +38,6 @@ io.on("connect", (socket, next) => {
         console.log(error);
       }
     }
-  });
-
-  socket.on("askForLatestConversations", async (userId) => {
-    const user = await getUserById(userId);
-    const conversations = await conversationService.getConversationsOfUserForCards(
-      user
-    );
-
-    socket.emit("sentCurrentUsersConversations", conversations);
   });
 
   socket.on("disconnect", () => console.log("session disconnected"));

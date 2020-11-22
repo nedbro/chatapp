@@ -14,7 +14,7 @@ export const MessageSection = ({
   const [messageToSend, setMessageToSend] = useState("");
 
   const observer = useRef();
-  const lastBookElementRef = useCallback(
+  const lastMessageElementRef = useCallback(
     (node) => {
       if (isLoading) return;
       if (observer.current) observer.current.disconnect();
@@ -63,13 +63,12 @@ export const MessageSection = ({
           {messages.length === index + 1 ? (
             <Chip
               label={message.text}
-              ref={lastBookElementRef}
+              ref={lastMessageElementRef}
               className="message"
             />
           ) : (
             <Chip
               label={message.text}
-              ref={lastBookElementRef}
               className="message"
             />
           )}

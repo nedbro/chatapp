@@ -53,33 +53,39 @@ exports.sendMessage = async (conversation, messageInput) => {
   return message.toObject({ depopulate: true });
 };
 
-exports.getConversationsOfUser = async (user) => {
-  return await Conversation.find()
-    .where("participants")
-    .in([user])
-    .populate("messages participants")
-    .sort({ last_active: -1 })
-    .limit(5);
-};
+exports.getConversationsOfUser = async (user, page, limit) => {
+  try {
+    const conversations = await Conversation.find()
+      .where("participants")
+      .in([user])
+      .populate("messages participants")
+      .sort({ last_active: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
 
-exports.getConversationsOfUserForCards = async (user) => {
-  const conversations = await Conversation.find()
-    .where("participants")
-    .in([user])
-    .populate("messages participants")
-    .sort({ last_active: -1 })
-    .limit(5);
+    const count = await Conversation.countDocuments();
 
-  conversations.forEach((conversation) => {
-    if (conversation.messages.length > 0) {
-      conversation.messages = conversation.messages.slice(
-        conversation.messages.length - 1,
-        conversation.messages.length
-      );
-    }
-  });
+    conversations.forEach((conversation) => {
+      if (conversation.messages.length > 0) {
+        conversation.messages = conversation.messages.slice(
+          conversation.messages.length - 1,
+          conversation.messages.length
+        );
+      }
+    });
 
-  return conversations;
+    const response = {
+      conversations,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+    };
+
+    console.log("response", response);
+    return response;
+  } catch (err) {
+    console.error(err.message);
+  }
 };
 
 exports.getConversationWithoutMessages = async (conversationId) => {
